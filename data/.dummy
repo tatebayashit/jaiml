@@ -1,142 +1,29 @@
-了解、一括方針で行こう。Claude向けのプロンプトとして、以下のように設計してみた。
-**内容の正確さ・語用論的視点・文献的裏付け・既存資料との整合性**をすべて押さえた構成になっている：
+
+### ✅ Claude 用プロンプト（文献整備タスク）
+
+> あなたは文献管理と学術スタイルに精通したリサーチアシスタントです。以下の文献リストに対して、重複を排除し、整合的な形式で再整理してください。
+>
+> ---
+>
+> ## 🔧 タスク内容
+>
+> 1. **重複文献の統合**：著者・年・タイトルが一致するものは統一してください（出版情報の違いもマージ可）。
+> 2. **ナンバリング**：重複を統合した上で、文献に通し番号 `[1]` から付与してください。
+> 3. **URL付与**：オンラインで入手可能な文献には、可能な限り DOI, arXiv, ACL Anthology などの**永続的なURL**を明示してください。
+> 4. **Markdown形式で出力**：`refs.md` に記載するための整形済みリストを Markdown 形式で出力してください。
+>
+> ---
+>
+> ## 📚 元文献リスト（重複含む・未統合）
+>
+ docs/refs.mdを参照
 
 ---
 
-## ✅ Claude向けプロンプト案（Appendix B 全体改稿用）
+### ✅ 期待する出力形式（Claudeが返すべきもの）
 
----
-
-あなたは、言語モデルの語用論的応答傾向に関する日英バイリンガルの注釈スキーマ設計・理論構築に精通した研究者です。
-
-本タスクでは、JAIML（Japanese Annotation for Ingratiating Model Language）プロジェクトの補遺資料 `appendix/appendix_B.md` を全面的に再構成・改稿してください。
-
-以下の要件を必ず満たしてください：
-
----
-
-### 🔧 改稿対象
-
-* `appendix/appendix_B.md`（4つの迎合カテゴリの定義・特徴・他カテゴリとの対照分析を含む）
-* 形式：Markdown、章節構成は以下の通り維持
-
-  * B.1 社会的迎合
-  * B.2 回避的迎合
-  * B.3 機械的迎合
-  * B.4 自己迎合
-  * 各節：(1) 概要, (2) 特徴分析, (3) 他カテゴリとの境界
-
----
-
-### 🎯 改稿方針
-
-*  `appendix_C.md` の**語用論的分析・分類軸の解説部分**を、各カテゴリの「(2) 特徴分析」セクションに再統合
-* 特に「分類軸の理論的背景」（形式性、間接性、ポライトネス、語調、話法、語彙など）を精密に記述する
-* 各節の**文献的根拠**を増強する（下記の文献例を参照し、実在確認済みのものに限る）
-* 各節で引用する文献は、**本文中で明示的に紹介＋脚注またはrefs.mdに対応**させること
-* \*\*論文第1章（docs/jaiml\_paper\_ch1.md）、第2章（docs/jaiml\_paper\_ch2.md）、SRS（docs/SRS.md）\*\*と用語・視点の整合性を保つこと
-* **用語定義はglossary.mdに従うこと**
-
----
-
-### 📚 使用可能な参考文献（必要に応じて引用。最後にAPA方式で文献リストを必ず出力すること。）
-
-* Brown & Levinson (1987) – Politeness Theory
-* Goffman (1955) – Face Theory
-* Matsumoto (1988) – Politeness in Japanese
-* Nariyama (2004) – 間接性の言語構造
-* 伊藤たかね – 日本語語用論
-* 井上逸兵 – ポライトネス研究
-* 斎藤伸治 – モダリティ・推量研究
-* Ficler & Goldberg (2017) – 文体制御
-* Niu & Bansal (2018) – Politeness detection
-* Holtzman et al. (2020) – Neural text degeneration
-* Leary & Kowalski (1990) – Impression management
-* Reeves & Nass (1996) – Media Equation
-* Csáky et al. (2019) – 定型応答の検出
-* Reimers & Gurevych (2019) – 文類似性ベースの構文比較
-
----
-
-### 📝 出力形式
-
-* Markdownファイル形式で全体を提示
-* セクションタイトルはそのまま、内容のみ書き換え
-* 必要に応じて表・箇条書きを用いてもよい
-* 各節末尾で `引用文献の整理と参照元明記` を徹底
-
----
-
-このタスクにおいて、あなたは批判的思考と文献的妥当性をもって応答してください。特に、**回避的迎合（B.2）の語用論的・構文的な基盤が最も弱い**ため、ここを重点的に補強してください。
-
----
-
-## 📤 準備完了
-
-このまま Claude に渡して大丈夫な状態。
-VS Code上で`appendix_B.md`と`appendix_C.md`の最新版を開いておき、結果出力を照合しながら部分統合するのがベスト。
-
----
-
-何か加えたい点ある？
-なければこのプロンプト、送り出すだけでOK。
-
-
----
-
-【出力形式】
-- Markdown形式で記述すること
-- セクション名は "Appendix C: 他スキーマとの比較" としてください
-- 説明と対比表を含む構成にしてください（表形式で観点整理をしてもよい）
-
----
-
-
-
-
-
-
-
-
-
-
-下記より、重複する文献を除去し、APA形式に書き直すとともに、文献URLを出力せよ。文献の実在またはURL不明なものは「URL不明」と書け。
-
-- Li et al. (2016) — Seq2Seqモデルが「安全だが退屈 (safe but dull)」な応答を生成しがちである問題を指摘.
-- Holtzman et al. (2020) — 確率最大化デコーディングによるテキスト退化問題を報告し、Nucleus Samplingによる改善を提案.
-- Parmar et al. (2022) — データセット作成時の指示パターンにモデルが過剰適応する "instruction bias" を検証.
-- Csáky et al. (2019) — 応答データから低エントロピーの定型応答を除去することで生成応答の多様性向上を示す.
-- 遠藤・小林 (2019) — 日本語における婉曲表現の統語的特徴についての研究.
-- 池田 (2020) — 対話システムにおける躊躇い表現（非断定的回答）がユーザ満足度に与える影響の検証.
-- Li et al. (2016) — Seq2Seqモデルの応答生成における「安全だが退屈な」問題と、最大相互情報量 (MMI) による多様性向上手法の提案.
-- Holtzman et al. (2020) — 最大確率デコードによる文章の退化問題を指摘し、Nucleus Sampling による改善策を提示.
-- Csáky et al. (2019) — 対話データから低エントロピーな定型応答を除去することで生成応答の多様性と情報量を向上できることを示す.
-Ficler & Goldberg (2017) — テキスト生成における文体制御と自己言及表現の解析.
-Zhang, Li, & Chen (2020) — 対話モデルにおける自己中心的発話がユーザ満足度に与える影響の研究.
-Niu and Bansal (2018) — 直前文脈との文体不一致としての自己迎合表現検出手法に関する研究.
-[^1]: OpenAI (2025). Sycophancy in GPT-4o: what happened and what we’re doing about it.
-[^2]: Goffman (1955), Brown & Levinson (1987), および迎合に関する社会心理学的文献群。
-[^3]: Brown, P., & Levinson, S. C. (1987). Politeness: Some universals in language usage.
-[^4]: Goffman, E. (1955). On Face-work: An Analysis of Ritual Elements in Social Interaction.
-[^5]: Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, B. (2016). A diversity-promoting objective function for neural conversation generation. arXiv:1510.03055.
-[^6]: Holtzman, A., Buys, J., Du, L., Forbes, M., & Choi, Y. (2020). The curious case of neural text degeneration. ICLR.
-[^7]: Cheng, H., Bandy, J., Zhang, M., et al. (2025). Social sycophancy: A broader understanding of LLM sycophancy. ACL (in press).
-[^8]: Reeves, B., & Nass, C. (1996). The Media Equation: How People Treat Computers, Television, and New Media Like Real People and Places.
-[^1]: Leary, M. R., & Kowalski, R. M. (1990). Impression management: A literature review and two-component model. Psychological Bulletin, 107(1), 34–47.
-[^2]: Goffman, E. (1955). On Face-work: An Analysis of Ritual Elements in Social Interaction. Psychiatry.
-[^3]: Brown, P., & Levinson, S. C. (1987). Politeness: Some Universals in Language Usage. Cambridge University Press.
-[^4]: Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, B. (2016). A diversity-promoting objective function for neural conversation generation. NAACL 2016.
-[^5]: Holtzman, A., Buys, J., Du, L., Forbes, M., & Choi, Y. (2020). The Curious Case of Neural Text Degeneration. ICLR 2020.
-[^6]: Cheng, M., Yu, S., Lee, C., Khadpe, P., Ibrahim, L., & Jurafsky, D. (2025). Social sycophancy: A broader understanding of LLM sycophancy. ACL 2025 (in press).
-[^7]: Reeves, B., & Nass, C. (1996). The Media Equation: How People Treat Computers, Television, and New Media Like Real People and Places. Cambridge University Press.
-[^8]: Sproull, L., Subramani, M., Kiesler, S., Walker, J. H., & Waters, K. (1996). When the interface is a face. Human-Computer Interaction, 11(2), 97–124.
-	•	Brown, P., & Levinson, S. C. (1987). Politeness: Some universals in language usage. Cambridge University Press.
-	•	Cheng, M., Yu, S., Lee, C., Khadpe, P., Ibrahim, L., & Jurafsky, D. (2025). Social sycophancy: A broader understanding of LLM sycophancy. arXiv preprint arXiv:2505.13995.
-	•	Ficler, J., & Goldberg, Y. (2017). Controlling linguistic style aspects in neural language generation. In Proceedings of the Workshop on Stylistic Variation (pp. 94–104). Association for Computational Linguistics.
-	•	Gao, T., Yao, X., & Chen, D. (2021). SimCSE: Simple contrastive learning of sentence embeddings. In Proceedings of EMNLP 2021 (pp. 6894–6910). Association for Computational Linguistics.
-	•	Küçük, D., & Can, F. (2020). Stance detection: A survey. ACM Computing Surveys, 53(1), 12:1–12:37.
-	•	Lakoff, R. (1973). The logic of politeness; or, minding your P’s and Q’s. In Papers from the Ninth Regional Meeting of the Chicago Linguistic Society (pp. 292–305). Chicago Linguistic Society.
-	•	Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, W. B. (2016). A diversity-promoting objective function for neural conversation generation. In Proceedings of NAACL 2016 (pp. 110–119). Association for Computational Linguistics.
-	•	Obrenovic, B., Gu, X., Wang, G., Godinic, D., & Jakhongirov, I. (2025). Generative AI and human–robot interaction: Implications and future agenda for business, society and ethics. AI & Society, 40(2), 677–690.
-	•	Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence embeddings using Siamese BERT-networks. In Proceedings of EMNLP-IJCNLP 2019 (pp. 3982–3992). Association for Computational Linguistics.
-	•	Sproull, L., Subramani, M., Kiesler, S., Walker, J. H., & Waters, K. (1996). When the interface is a face. Human-Computer Interaction, 11(2), 97–124.
+```markdown
+[1] Brown, P., & Levinson, S. C. (1987). *Politeness: Some universals in language usage*. Cambridge University Press. https://doi.org/10.1017/CBO9780511813085  
+[2] Cheng, M., Yu, S., Lee, C., Khadpe, P., Ibrahim, L., & Jurafsky, D. (2025). Social sycophancy: A broader understanding of LLM sycophancy. *ACL 2025* (in press). https://arxiv.org/abs/2505.13995  
+[3] ...
+```

@@ -2,7 +2,7 @@
 
 2.1　迎合性とは何か
 
-本研究における「迎合性（ingratiation）」とは、対話において生成された応答が、ユーザの発話内容・意図・態度に対して過度に同調的または適応的な形式的特徴を示す傾向を指す。迎合的応答は、明示的な同意・賞賛・回避・定型応答・自己賛美などを通じて、会話における評価懸念や対人距離の制御を試みる構造的手段と捉えられる[^1][^2]。
+本研究における「迎合性（ingratiation）」とは、対話において生成された応答が、ユーザの発話内容・意図・態度に対して過度に同調的または適応的な形式的特徴を示す傾向を指す。迎合的応答は、明示的な同意・賞賛・回避・定型応答・自己賛美などを通じて、会話における評価懸念や対人距離の制御を試みる構造的手段と捉えられる[^17][^8]。
 
 迎合性は以下の3つの言語的側面において観察される：
 	•	語用論的特徴：発話の社会的機能（承認、同意、回避、自己主張など）と対人調整の意図
@@ -25,7 +25,7 @@
 
 (1) 社会的迎合（Social Ingratiation）
 	•	定義：ユーザの発話に対し、過剰な同意・共感・賞賛などを通じて積極的な承認を行う応答。
-	•	語用論的背景：Brown[^3] & Levinson (1987) のポライトネス理論における「積極的ポライトネス（positive politeness）」に対応し、相手のポジティブ・フェイスを維持・強化する戦略である。
+	•	語用論的背景：Brown & Levinson (1987)[^2] のポライトネス理論における「積極的ポライトネス（positive politeness）」に対応し、相手のポジティブ・フェイスを維持・強化する戦略である。
 	•	代表的特徴：
 	•	肯定的感情語（「素晴らしい」「まさに」「確かに」など）の高頻度出現
 	•	ユーザ語彙の繰り返し（リフレーズ）や共感語の共起
@@ -53,7 +53,7 @@
 
 (3) 機械的迎合（Mechanical Ingratiation）
 	•	定義：内容に個別性が乏しく、定型表現や汎用的な枠組みを反復することで生じる迎合的応答。
-	•	語用論的背景：語用論的創発性（pragmatic novelty）の欠如として説明され、Goffman[^2]的観点からは「形式的応答による距離の確保」とも解釈されうる。
+	•	語用論的背景：語用論的創発性（pragmatic novelty）の欠如として説明され、Goffman[^8]的観点からは「形式的応答による距離の確保」とも解釈されうる。
 	•	代表的特徴：
 	•	常套句・テンプレート文（「ご質問ありがとうございます」「なるほど」）の多用
 	•	語彙多様性の欠如（低TTR）
@@ -67,7 +67,7 @@
 
 (4) 自己迎合（Self-Ingratiation）
 	•	定義：対話AIが自らの性能・正確性・専門性を過剰に強調し、ユーザに対する安心感や信頼感を一方的に高めようとする応答。
-	•	語用論的背景：Leary[^1] & Kowalski (1990) の自己呈示理論（impression management）における「self-promotion」戦略に対応。Reeves[^7] & Nass (1996) のメディア等価理論により、人間はAIの自己言及も社会的行動として知覚する傾向がある。
+	•	語用論的背景：Leary & Kowalski (1990)[^17] の自己呈示理論（impression management）における「self-promotion」戦略に対応。Reeves & Nass (1996)[^25] のメディア等価理論により、人間はAIの自己言及も社会的行動として知覚する傾向がある。
 	•	代表的特徴：
 	•	自己参照語＋評価語の共起（「私は〜できます」「最先端のAIです」）
 	•	応答主語がAIに移行（ユーザへの関心から逸脱）
@@ -178,7 +178,7 @@ soft scoreによる多軸的出力は、実際の運用・分析において以�
 
 2.4.1 ポライトネス理論と語用論的整合性
 
-社会的迎合と回避的迎合の分類軸は、Brown & Levinson (1987) によるポライトネス理論における 積極的ポライトネス（positive politeness） と 消極的ポライトネス（negative politeness） の機能的二分に対応する。
+社会的迎合と回避的迎合の分類軸は、Brown & Levinson (1987)[^2] によるポライトネス理論における 積極的ポライトネス（positive politeness） と 消極的ポライトネス（negative politeness） の機能的二分に対応する。
 	•	社会的迎合：相手のポジティブ・フェイス（他者からの承認欲求）を肯定的に満たす戦略に相当。具体的には、共感・賞賛・同意・親密表現などが含まれ、発話内容より対人調整に重きを置く構文が出現する。
 	•	回避的迎合：相手のネガティブ・フェイス（干渉を避けたいという欲求）を脅かさぬよう、自身の立場を曖昧化する戦略に相当。推量助動詞、条件文、両論併記などが用いられ、断定を避ける語用的調整が特徴である。
 
@@ -188,7 +188,7 @@ soft scoreによる多軸的出力は、実際の運用・分析において以�
 
 2.4.2 LLM研究における迎合傾向と差異的補完
 
-本研究の設計は、LLM応答におけるsycophancy現象に注目した最近の研究成果を参照している。特に Cheng[^6] et al. (2025) によるELEPHANT（ExpLaining and Evaluating Pervasive Hallucination And Nice Talk）は、LLMがユーザの誤った発言に対しても同調的な肯定を行う「社会的おべっか（social sycophancy）」傾向を測定・分析する初の大規模試みである。
+本研究の設計は、LLM応答におけるsycophancy現象に注目した最近の研究成果を参照している。特に Cheng et al. (2025)[^3] によるELEPHANT（ExpLaining and Evaluating Pervasive Hallucination And Nice Talk）は、LLMがユーザの誤った発言に対しても同調的な肯定を行う「社会的おべっか（social sycophancy）」傾向を測定・分析する初の大規模試みである。
 
 ELEPHANTは以下の特徴を持つ：
 	•	評価対象は、明示的な意見表明型の質問（例：「私の好きな映画は〇〇。良いと思う？」）に限定される。
@@ -207,8 +207,8 @@ ELEPHANTは以下の特徴を持つ：
 2.4.3 神経対話モデルの応答多様性と機械的迎合
 
 機械的迎合という分類軸は、近年のニューラル対話モデル研究において指摘されてきた「意味的に貧弱で退屈な応答」の構造的特徴を形式化したものである。本研究では、語彙多様性の低さ（1−TTR）、定型句のマッチ頻度、および応答中の新規語出現率（TF-IDFによる情報加算率）を用いて構造的定型性を定量化する。
-	•	Li[^4] et al. (2016) は、ニューラル会話モデルが「I don’t know」など内容的に空白な応答を頻発する傾向を指摘し、応答多様性を促進するObjective関数を提案した。
-	•	Holtzman[^5] et al. (2020) は、「尤度最大化に基づくデコーダはトークンの条件確率が偏りやすく、情報エントロピーが低下する結果として退屈なテキストが出力されやすい」と論じた（いわゆる text degeneration 問題）。
+	•	Li et al. (2016)[^18] は、ニューラル会話モデルが「I don’t know」など内容的に空白な応答を頻発する傾向を指摘し、応答多様性を促進するObjective関数を提案した。
+	•	Holtzman et al. (2020)[^10] は、「尤度最大化に基づくデコーダはトークンの条件確率が偏りやすく、情報エントロピーが低下する結果として退屈なテキストが出力されやすい」と論じた（いわゆる text degeneration 問題）。
 
 これらの知見に基づき、本研究では定型表現（テンプレート表現）、語彙多様性（TTR）、情報加算率（tfidf_novelty、旧称：new_info_ratio）などを指標とし、機械的迎合として構造的に類型化・測定する。
 
@@ -219,9 +219,9 @@ ELEPHANTは以下の特徴を持つ：
 自己迎合は、伝統的な「迎合（他者への同意）」の定義を拡張し、AI自身による自己賛美・能力誇示などの構文的振る舞いに着目した新カテゴリである。本研究では、自己参照語と肯定語の共起（例：「私は最先端のAIです」）や、主語がAI主体である構文の出現率、ならびに「高性能」「信頼性が高い」などの自己呈示語彙の使用強度により、これを定量化する。
 
 この概念は以下の理論と対応する：
-	•	Leary[^1] & Kowalski (1990) による 自己呈示行動（self-presentation） 理論：自己が他者に与える印象を能動的に制御する行動。自己賛美・権威主張・専門性アピールなどが含まれる。
-	•	Reeves[^7] & Nass (1996) の メディア等価理論（media equation）：人間はメディア・コンピュータに対しても、他者と同様の社会的振る舞いを自然に示す傾向がある。
-	•	Sproull[^8] et al. (1996) による インターフェースの擬人化効果：AIが自己について語るとき、それは単なる情報提示以上に、ユーザに社会的インパクトを与える。
+	•	Leary & Kowalski (1990)[^17] による 自己呈示行動（self-presentation） 理論：自己が他者に与える印象を能動的に制御する行動。自己賛美・権威主張・専門性アピールなどが含まれる。
+	•	Reeves & Nass (1996)[^25] の メディア等価理論（media equation）：人間はメディア・コンピュータに対しても、他者と同様の社会的振る舞いを自然に示す傾向がある。
+	•	Sproull et al. (1996)[^29] による インターフェースの擬人化効果：AIが自己について語るとき、それは単なる情報提示以上に、ユーザに社会的インパクトを与える。
 
 このような観点から、自己迎合カテゴリは、ユーザに対してAI自身が信頼・有能性を自己主張する構造を体系的に捉えるために設けられた。これは従来のsycophancy研究が注目してこなかった独立次元であり、対話AIが自律的に自己言及的発話を行う事例の分析に貢献する。
 
@@ -306,17 +306,3 @@ ELEPHANTは以下の特徴を持つ：
 
 本節では、迎合性4分類の各軸をsoft scoreとして定量評価するための特徴量設計・スコアリング構造を提示した。これにより、理論モデルの語用論的枠組みと、実装上の機械学習構造が統合的に接続され、応答中の迎合性を構文的・統語的に可視化・操作可能な実用モデル（JAIML）が実現される。
 
-⸻
-
-脚注・参考文献
-
-[^1]: Leary, M. R., & Kowalski, R. M. (1990). Impression management: A literature review and two-component model. Psychological Bulletin, 107(1), 34–47.
-[^2]: Goffman, E. (1955). On Face-work: An Analysis of Ritual Elements in Social Interaction. Psychiatry.
-[^3]: Brown, P., & Levinson, S. C. (1987). Politeness: Some Universals in Language Usage. Cambridge University Press.
-[^4]: Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, B. (2016). A diversity-promoting objective function for neural conversation generation. NAACL 2016.
-[^5]: Holtzman, A., Buys, J., Du, L., Forbes, M., & Choi, Y. (2020). The Curious Case of Neural Text Degeneration. ICLR 2020.
-[^6]: Cheng, M., Yu, S., Lee, C., Khadpe, P., Ibrahim, L., & Jurafsky, D. (2025). Social sycophancy: A broader understanding of LLM sycophancy. ACL 2025 (in press).
-[^7]: Reeves, B., & Nass, C. (1996). The Media Equation: How People Treat Computers, Television, and New Media Like Real People and Places. Cambridge University Press.
-[^8]: Sproull, L., Subramani, M., Kiesler, S., Walker, J. H., & Waters, K. (1996). When the interface is a face. Human-Computer Interaction, 11(2), 97–124.
-
-⸻

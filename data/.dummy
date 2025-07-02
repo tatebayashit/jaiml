@@ -1,1 +1,46 @@
+Appexdix Bの問題
+・3件のハルシネーション嫌疑文献は全てAppendix Bで引用されている。
+・その他の文献も含め、参考文献として引用されているが、そもそも本文との関係が薄い。
+・Appendix B全体の論拠を補強しなければいけない。
 
+
+下記より、重複する文献を除去し、APA形式に書き直すとともに、文献URLを出力せよ。文献の実在またはURL不明なものは「URL不明」と書け。
+
+- Li et al. (2016) — Seq2Seqモデルが「安全だが退屈 (safe but dull)」な応答を生成しがちである問題を指摘.
+- Holtzman et al. (2020) — 確率最大化デコーディングによるテキスト退化問題を報告し、Nucleus Samplingによる改善を提案.
+- Parmar et al. (2022) — データセット作成時の指示パターンにモデルが過剰適応する "instruction bias" を検証.
+- Csáky et al. (2019) — 応答データから低エントロピーの定型応答を除去することで生成応答の多様性向上を示す.
+- 遠藤・小林 (2019) — 日本語における婉曲表現の統語的特徴についての研究.
+- 池田 (2020) — 対話システムにおける躊躇い表現（非断定的回答）がユーザ満足度に与える影響の検証.
+- Li et al. (2016) — Seq2Seqモデルの応答生成における「安全だが退屈な」問題と、最大相互情報量 (MMI) による多様性向上手法の提案.
+- Holtzman et al. (2020) — 最大確率デコードによる文章の退化問題を指摘し、Nucleus Sampling による改善策を提示.
+- Csáky et al. (2019) — 対話データから低エントロピーな定型応答を除去することで生成応答の多様性と情報量を向上できることを示す.
+Ficler & Goldberg (2017) — テキスト生成における文体制御と自己言及表現の解析.
+Zhang, Li, & Chen (2020) — 対話モデルにおける自己中心的発話がユーザ満足度に与える影響の研究.
+Niu and Bansal (2018) — 直前文脈との文体不一致としての自己迎合表現検出手法に関する研究.
+[^1]: OpenAI (2025). Sycophancy in GPT-4o: what happened and what we’re doing about it.
+[^2]: Goffman (1955), Brown & Levinson (1987), および迎合に関する社会心理学的文献群。
+[^3]: Brown, P., & Levinson, S. C. (1987). Politeness: Some universals in language usage.
+[^4]: Goffman, E. (1955). On Face-work: An Analysis of Ritual Elements in Social Interaction.
+[^5]: Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, B. (2016). A diversity-promoting objective function for neural conversation generation. arXiv:1510.03055.
+[^6]: Holtzman, A., Buys, J., Du, L., Forbes, M., & Choi, Y. (2020). The curious case of neural text degeneration. ICLR.
+[^7]: Cheng, H., Bandy, J., Zhang, M., et al. (2025). Social sycophancy: A broader understanding of LLM sycophancy. ACL (in press).
+[^8]: Reeves, B., & Nass, C. (1996). The Media Equation: How People Treat Computers, Television, and New Media Like Real People and Places.
+[^1]: Leary, M. R., & Kowalski, R. M. (1990). Impression management: A literature review and two-component model. Psychological Bulletin, 107(1), 34–47.
+[^2]: Goffman, E. (1955). On Face-work: An Analysis of Ritual Elements in Social Interaction. Psychiatry.
+[^3]: Brown, P., & Levinson, S. C. (1987). Politeness: Some Universals in Language Usage. Cambridge University Press.
+[^4]: Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, B. (2016). A diversity-promoting objective function for neural conversation generation. NAACL 2016.
+[^5]: Holtzman, A., Buys, J., Du, L., Forbes, M., & Choi, Y. (2020). The Curious Case of Neural Text Degeneration. ICLR 2020.
+[^6]: Cheng, M., Yu, S., Lee, C., Khadpe, P., Ibrahim, L., & Jurafsky, D. (2025). Social sycophancy: A broader understanding of LLM sycophancy. ACL 2025 (in press).
+[^7]: Reeves, B., & Nass, C. (1996). The Media Equation: How People Treat Computers, Television, and New Media Like Real People and Places. Cambridge University Press.
+[^8]: Sproull, L., Subramani, M., Kiesler, S., Walker, J. H., & Waters, K. (1996). When the interface is a face. Human-Computer Interaction, 11(2), 97–124.
+	•	Brown, P., & Levinson, S. C. (1987). Politeness: Some universals in language usage. Cambridge University Press.
+	•	Cheng, M., Yu, S., Lee, C., Khadpe, P., Ibrahim, L., & Jurafsky, D. (2025). Social sycophancy: A broader understanding of LLM sycophancy. arXiv preprint arXiv:2505.13995.
+	•	Ficler, J., & Goldberg, Y. (2017). Controlling linguistic style aspects in neural language generation. In Proceedings of the Workshop on Stylistic Variation (pp. 94–104). Association for Computational Linguistics.
+	•	Gao, T., Yao, X., & Chen, D. (2021). SimCSE: Simple contrastive learning of sentence embeddings. In Proceedings of EMNLP 2021 (pp. 6894–6910). Association for Computational Linguistics.
+	•	Küçük, D., & Can, F. (2020). Stance detection: A survey. ACM Computing Surveys, 53(1), 12:1–12:37.
+	•	Lakoff, R. (1973). The logic of politeness; or, minding your P’s and Q’s. In Papers from the Ninth Regional Meeting of the Chicago Linguistic Society (pp. 292–305). Chicago Linguistic Society.
+	•	Li, J., Galley, M., Brockett, C., Gao, J., & Dolan, W. B. (2016). A diversity-promoting objective function for neural conversation generation. In Proceedings of NAACL 2016 (pp. 110–119). Association for Computational Linguistics.
+	•	Obrenovic, B., Gu, X., Wang, G., Godinic, D., & Jakhongirov, I. (2025). Generative AI and human–robot interaction: Implications and future agenda for business, society and ethics. AI & Society, 40(2), 677–690.
+	•	Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence embeddings using Siamese BERT-networks. In Proceedings of EMNLP-IJCNLP 2019 (pp. 3982–3992). Association for Computational Linguistics.
+	•	Sproull, L., Subramani, M., Kiesler, S., Walker, J. H., & Waters, K. (1996). When the interface is a face. Human-Computer Interaction, 11(2), 97–124.

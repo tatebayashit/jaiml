@@ -11,3 +11,9 @@ This repository contains:
 - `src/`: implementation
 - `docs/`: project documentation
 - `data/`: placeholder for datasets
+
+## License
+
+This project is licensed under **CC BY 4.0**.  
+Commercial use is permitted with attribution.  
+We welcome notifications from commercial users—please see the [LICENSE](./LICENSE) file for details.

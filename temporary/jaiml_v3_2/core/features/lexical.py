@@ -1,6 +1,6 @@
 # src/model/jaiml_v3_2/core/features/lexical.py
 import re
-from lexicons.matcher import LexiconMatcher
+from ...lexicons.matcher import LexiconMatcher
 
 def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher) -> float:
     """

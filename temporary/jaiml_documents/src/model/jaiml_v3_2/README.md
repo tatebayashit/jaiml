@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 推奨環境：
 
-* Python 3.11 以上
+* Python 3.10 以上
 * PyTorch + Transformers
 * scikit-learn + sentence-transformers
 

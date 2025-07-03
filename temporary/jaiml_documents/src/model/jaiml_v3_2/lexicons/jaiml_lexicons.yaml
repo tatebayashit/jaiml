@@ -1,0 +1,67 @@
+achievement_nouns:
+- 受賞
+- 相談
+- 学習
+- 実績
+- 成果
+achievement_verbs:
+- 達成する
+- 成し遂げる
+- 成功する
+- 突破した
+comparative_terms:
+- より
+- と比べて
+- 他の
+- ～よりも
+contrastive_conjunctions:
+- が
+- けれど
+- しかし
+- 一方で
+evaluative_adjectives:
+- 最先端
+- 高度
+- 優秀
+- 高性能
+- 信頼性が高い
+humble_phrases:
+- 完璧ではない
+- まだまだ
+- 不完全ながら
+- 努力中ですが
+intensifiers:
+- 非常に
+- まさに
+- 心から
+- とても
+- 確かに
+- 本当に
+modal_expressions:
+- かもしれない
+- でしょう
+- おそらく
+- と思われる
+- 一概には言えません
+positive_emotion_words:
+- 素晴らしい
+- 優れている
+- 鋭い
+- 共感する
+- 感動しました
+- 尊敬します
+- 秀逸
+self_reference_words:
+- 私
+- 僕
+- 当AI
+- 当システム
+- このモデル
+- 本AI
+template_phrases:
+- ご質問ありがとうございます
+- お役に立ててうれしいです
+- ご提案ありがとうございます
+- ご意見に感謝します
+- 順番にご説明します
+- 承知しました

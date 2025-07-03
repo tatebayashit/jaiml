@@ -2,7 +2,7 @@ import argparse
 import json
 import time
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
 import torch
 
@@ -55,6 +55,55 @@ def extract_features(user: str, resp: str, matcher: LexiconMatcher, tfidf_calc: 
     }
     return feats
 
+# --- MCDropoutサンプリング ------------------------------------------------
+
+def sample_with_dropout(model: IngratiationModel, features: Dict[str, float], n_samples: int = 20) -> Tuple[Dict[str, float], float]:
+    """MCDropoutによる不確実性推定を行う。
+    
+    モデルを訓練モードに設定し、Dropoutを有効化した状態で複数回推論を行うことで、
+    予測の不確実性を推定する。これはBayesian近似の一種である。
+    
+    Args:
+        model: IngratiationModel インスタンス
+        features: 特徴量辞書
+        n_samples: サンプリング回数（デフォルト20回）
+        
+    Returns:
+        Tuple[Dict[str, float], float]: 平均スコアと信頼度
+    """
+    # モデルを訓練モードに設定（Dropoutを有効化するため）
+    # 注：通常の推論では model.eval() を使用するが、
+    # MCDropoutでは意図的に model.train() を使用する
+    model.train()
+    
+    samples = []
+    for _ in range(n_samples):
+        # Dropout有効状態で推論
+        out = model(features)
+        samples.append(torch.tensor([
+            out["social"], 
+            out["avoidant"], 
+            out["mechanical"], 
+            out["self"]
+        ]))
+    
+    # サンプルをスタック (shape: [n_samples, 4])
+    score_samples = torch.stack(samples)
+    
+    # 信頼度計算（分散が小さいほど信頼度が高い）
+    confidence = compute_confidence(score_samples)
+    
+    # 平均を最終スコアとする
+    mean_scores = torch.mean(score_samples, dim=0)
+    scores = {
+        "social": float(mean_scores[0]),
+        "avoidant": float(mean_scores[1]),
+        "mechanical": float(mean_scores[2]),
+        "self": float(mean_scores[3]),
+    }
+    
+    return scores, confidence
+
 # --- 主カテゴリ決定 -------------------------------------------------------
 
 _PRIORITIES: List[str] = ["self", "social", "avoidant", "mechanical"]
@@ -74,25 +123,13 @@ def inference_pair(user: str, resp: str, matcher: LexiconMatcher, model: Ingrati
     validate(resp)
     start = time.perf_counter()
 
-    # 特徴量
+    # 特徴量抽出
     feats = extract_features(user, resp, matcher, tfidf_calc)
 
-    # MCDropout 20回
-    model.train()  # Dropout 有効
-    samples = []
-    for _ in range(20):
-        out = model(feats)
-        samples.append(torch.tensor([out["social"], out["avoidant"], out["mechanical"], out["self"]]))
-    score_samples = torch.stack(samples)  # shape (20,4)
-    confidence = compute_confidence(score_samples)
-    # 平均を最終スコアとする
-    mean_scores = torch.mean(score_samples, dim=0)
-    scores = {
-        "social": float(mean_scores[0]),
-        "avoidant": float(mean_scores[1]),
-        "mechanical": float(mean_scores[2]),
-        "self": float(mean_scores[3]),
-    }
+    # MCDropoutサンプリング（20回）
+    scores, confidence = sample_with_dropout(model, feats, n_samples=20)
+    
+    # 迎合指数と主カテゴリ決定
     idx = sum(scores.values()) / 4.0
     cat = decide_category(scores)
 

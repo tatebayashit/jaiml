@@ -1,6 +1,8 @@
-from typing import List
+# src/model/jaiml_v3_2/core/features/corpus_based.py
+from typing import List, Callable
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
+from core.utils.tokenize import mecab_tokenize
 
 __all__ = [
     "TFIDFNoveltyCalculator",
@@ -15,7 +17,24 @@ class TFIDFNoveltyCalculator:
     """
 
     def __init__(self):
-        self.vectorizer = TfidfVectorizer(token_pattern=r"(?u)\b\w+\b", min_df=1, max_df=0.9)
+        # MeCabトークナイザを使用
+        self.vectorizer = TfidfVectorizer(
+            tokenizer=self._mecab_tokenize,
+            token_pattern=None,  # tokenizerを使用する場合は無効化
+            min_df=1,
+            max_df=0.9
+        )
+    
+    def _mecab_tokenize(self, text: str) -> List[str]:
+        """TfidfVectorizer用のトークナイザ関数。
+        
+        Args:
+            text: 入力テキスト
+            
+        Returns:
+            List[str]: 形態素のリスト
+        """
+        return mecab_tokenize(text)
 
     def compute(self, user_text: str, response_text: str) -> float:
         """情報加算率を算出する。

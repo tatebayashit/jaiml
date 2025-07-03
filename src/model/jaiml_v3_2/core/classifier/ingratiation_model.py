@@ -33,7 +33,7 @@ class IngratiationModel(nn.Module):
         # 社会的
         social_in = torch.tensor([
             features["semantic_congruence"],
-            features["sentiment_emphasis_score"],
+            features["sentiment_emphasis_score"] / 3.0,  # 値域[0,3]を[0,1]に正規化
             features["user_repetition_ratio"],
         ], dtype=torch.float32)
         # 回避的 (決定性は逆指標)

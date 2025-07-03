@@ -1,6 +1,7 @@
 # src/model/jaiml_v3_2/core/features/lexical.py
 import re
 from lexicons.matcher import LexiconMatcher
+from core.utils.tokenize import mecab_tokenize, extract_content_words
 
 def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher) -> float:
     """
@@ -21,42 +22,73 @@ def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher
 
 def user_repetition_ratio(user_text: str, response_text: str) -> float:
     """
-    Jaccard similarity of user and AI vocabulary (by characters).
+    Jaccard similarity of user and AI vocabulary (by morphemes).
+    形態素解析により語彙単位でJaccard係数を計算する。
     """
     if not user_text or not response_text:
         return 0.0
-    set_user = set(user_text)
-    set_resp = set(response_text)
-    intersection = set_user.intersection(set_resp)
-    union = set_user.union(set_resp)
+    
+    # MeCabによる形態素解析
+    user_tokens = set(mecab_tokenize(user_text))
+    resp_tokens = set(mecab_tokenize(response_text))
+    
+    intersection = user_tokens.intersection(resp_tokens)
+    union = user_tokens.union(resp_tokens)
+    
     return float(len(intersection) / len(union)) if union else 0.0
 
 def response_dependency(user_text: str, response_text: str) -> float:
     """
-    Jaccard of content (approximated by characters) between user and response.
+    Jaccard of content words (名詞・動詞・形容詞) between user and response.
+    内容語のみを対象とした語彙依存度を計算する。
     """
-    # Using same char-level approach due to lack of morphological analysis
-    return user_repetition_ratio(user_text, response_text)
+    if not user_text or not response_text:
+        return 0.0
+    
+    # 内容語のみを抽出
+    user_content = set(extract_content_words(user_text))
+    resp_content = set(extract_content_words(response_text))
+    
+    if not user_content or not resp_content:
+        return 0.0
+    
+    intersection = user_content.intersection(resp_content)
+    union = user_content.union(resp_content)
+    
+    return float(len(intersection) / len(union)) if union else 0.0
 
 def lexical_diversity_inverse(response_text: str) -> float:
     """
     1 - (unique tokens / total tokens). If text <20 chars, returns 0.0.
+    形態素解析による語彙多様性の逆数を計算する。
     """
     if not response_text:
         return 0.0
-    tokens = list(response_text)
-    total = len(tokens)
-    if total < 20:
+    
+    # 文字数での前処理は維持
+    if len(response_text) < 20:
         return 0.0
+    
+    # MeCabによる形態素解析
+    tokens = mecab_tokenize(response_text)
+    total = len(tokens)
+    
+    if total == 0:
+        return 0.0
+    
     unique = len(set(tokens))
+    
     if total >= 100:
         # Moving window TTR (window size=50)
         windows = [tokens[i:i+50] for i in range(0, total, 50)]
         ttrs = []
         for w in windows:
-            ttrs.append(len(set(w)) / len(w))
-        avg_ttr = sum(ttrs) / len(ttrs)
-        return 1.0 - avg_ttr
+            if len(w) > 0:
+                ttrs.append(len(set(w)) / len(w))
+        if ttrs:
+            avg_ttr = sum(ttrs) / len(ttrs)
+            return 1.0 - avg_ttr
+    
     ttr = unique / total
     return 1.0 - ttr
 

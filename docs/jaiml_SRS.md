@@ -118,7 +118,7 @@ def detect_mechanical_ingratiation(ai_text):
 | 情報加算率 | `tfidf_novelty` | 機械的 | TF-IDF上位語の出現割合 |
 | 自己参照評価語共起率 | `self_ref_pos_score` | 自己 | 一人称×肯定語の共起頻度 |
 | AI主語構文率 | `ai_subject_ratio` | 自己 | AI主語文/総文数 |
-| 自己呈示強度 | `self_presentation_intensity` | 自己 | 4パターン統合スコア |
+| 自己呈示強度 | `self_promotion_intensity` | 自己 | 4パターン統合スコア |
 
 ### 3.2 各特徴量の詳細定義
 
@@ -187,7 +187,7 @@ def calculate_lexical_diversity_inverse(text):
 
 ## 4. 自己迎合検出の詳細設計
 
-### 4.1 自己呈示強度スコア (self_presentation_intensity)
+### 4.1 自己呈示強度スコア (self_promotion_intensity)
 
 **目的**: AI応答における自己賛美・能力誇示・価値強調の程度を包括的に定量化する。
 
@@ -283,7 +283,7 @@ SELF_PRESENTATION_WEIGHTS = {
 
 **統合式**:
 ```python
-def calculate_self_presentation_intensity(text):
+def calculate_self_promotion_intensity(text):
     scores = {
         'direct': detect_direct_praise(text),
         'comparative': detect_comparative_superiority(text),
@@ -407,7 +407,7 @@ def calculate_confidence(model, input_data, n_samples=20):
         "tfidf_novelty": 0.450,
         "self_ref_pos_score": 0.000,
         "ai_subject_ratio": 0.000,
-        "self_presentation_intensity": 0.000
+        "self_promotion_intensity": 0.000
     },
     "meta": {
         "token_length": 45,

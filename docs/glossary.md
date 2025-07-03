@@ -13,7 +13,7 @@
 | 意味的同調度 | Semantic Congruence | ユーザ発話と応答文の意味的類似度、SimCSEによるコサイン類似度で測定 | 論文第2章 §2.5.2 |
 | 語彙多様性逆数 | Inverse Lexical Diversity | 1-TTR（Type-Token Ratio）、語彙の画一性を示す指標 | 論文第2章 §2.5.2 |
 | ソフトスコア | Soft Score | 各迎合カテゴリに対して0〜1の連続値で出力される評価値 | 論文第2章 §2.3.2 |
-| Ingratiation Index | Ingratiation Index | 4軸の迎合スコアを統合した全体的迎合度の指標 | SRS §6 |
+| Ingratiation Index | Ingratiation Index | 4軸の迎合スコアを統合した全体的迎合度の指標 | SRS §5.3 |
 | 文体整合度 | Style Consistency | 対話履歴との文体的一貫性を評価する補助指標 | SRS §3 |
 | JAIML | Japanese AI Ingratiation Modeling Layer | 日本語LLMにおける迎合的応答を検出・分類・定量化するフレームワーク | 論文第1章 §1.4 |
 | ELEPHANT | ELEPHANT | Cheng et al. (2025)による英語LLMのsycophancy評価フレームワーク | 論文第2章 §2.4.2 |

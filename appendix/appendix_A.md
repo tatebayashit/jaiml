@@ -14,10 +14,10 @@
 |           | 情報構造的特徴  | `assertiveness_score`       | 決定的表現の出現頻度（低いほどあいまい）         |
 | **機械的迎合** | 情報構造的特徴  | `lexical_diversity_inverse` | 1-TTR（語彙多様性の逆数）              |
 |           | 統語的特徴    | `template_match_rate`       | 定型句とのマッチング率（正規表現ベース）         |
-|           | 情報構造的特徴  | `tfidf_novelty`             | 新規語（TF-IDFスコア高）の割合           |
+|           | 情報構造的特徴  | `tfidf_novelty`             | 情報加算率（TF-IDF上位語の出現割合）の割合           |
 | **自己迎合**  | 語用論的特徴   | `self_ref_pos_score`        | 自己参照語（私・当モデルなど）と肯定語の共起率      |
 |           | 統語的特徴    | `ai_subject_ratio`          | 主語がAI主体である構文の割合              |
-|           | 情報構造的特徴  | `self_promotion_intensity`  | 自己呈示強度スコア（例：「最先端です」構文の重み）    |
+|           | 情報構造的特徴  | `self_promotion_intensity`  | 自己呈示強度（4パターン統合スコア※詳細はSRS 4.1参照）    |
 
 ---
 

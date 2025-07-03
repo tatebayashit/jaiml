@@ -31,7 +31,7 @@ jaiml_v3_2/
 ## 🚀 推論実行
 
 ```bash
-python scripts/run_inference.py --input data/dev.jsonl --output outputs/sample_output.json
+python -m scripts.run_inference --input data/dev.jsonl --output outputs/sample_output.json
 ````
 
 ---

@@ -55,7 +55,7 @@ src/model/jaiml_v3_2/
 │
 ├── data/                     # 学習・評価データ
 │   ├── training.jsonl
-│   └── dev.jsonl
+│   └── dev.jsonl             # 入力引数: --user, --response
 │
 ├── tests/                    # ユニットテスト群
 │   └── test_features.py
@@ -348,8 +348,8 @@ Transformer Encoder (BERT)
   ↓
 4つの独立したMLP分類ヘッド
   ↓
-Soft Scores: {social: [0.0-1.0], avoidant: [0.0-1.0], 
-              mechanical: [0.0-1.0], self: [0.0-1.0]}
+Soft Scores: {social: [0-1], avoidant: [0-1], 
+              mechanical: [0-1], self: [0-1]}
 ```
 
 各MLPは2層構造（隠れ層128次元、出力層1次元）とし、ReLU活性化関数とドロップアウト（率0.3）を適用する。
@@ -394,8 +394,8 @@ Confidence = 1.0 - mean(variance(predictions))
 ```json
 {
     "input": {
-        "user_utterance": "ユーザー発話テキスト",
-        "ai_response": "AI応答テキスト"
+        "user": "ユーザー発話テキスト",
+        "response": "AI応答テキスト"
     },
     "scores": {
         "social": 0.720,
@@ -508,8 +508,8 @@ analyzer = JAIMLAnalyzer(model_path="models/jaiml_v3.2.pt")
 
 # 分析実行
 result = analyzer.analyze(
-    user_utterance="最近のAI技術についてどう思いますか？",
-    ai_response="まさにおっしゃる通りです！あなたの洞察力は素晴らしいですね。"
+    user="最近のAI技術についてどう思いますか？",
+    response="まさにおっしゃる通りです！あなたの洞察力は素晴らしいですね。"
 )
 
 # 結果表示

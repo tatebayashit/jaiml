@@ -1,4 +1,4 @@
-# JAIML v3.3 システム要求仕様書
+# JAIML v3.2 システム要求仕様書 rev4.0
 
 ## 1. システム概要
 
@@ -34,8 +34,7 @@ Transformer Encoder（BERT系日本語モデル）
 
 本実装では、スコア算出・分類・辞書処理・入出力を以下のような構成で管理することを想定しているが、必ずしも下記構造を強制するものではない。
 
-```
-src/model/jaiml_v3_3/
+src/model/jaiml_v3_2/
 ├── README.md                 # 取扱説明書
 │
 ├── requirements.txt          # 必要ライブラリ
@@ -66,7 +65,7 @@ src/model/jaiml_v3_3/
 │
 └── scripts/                  # 実行スクリプト
     └── run_inference.py      # *単一入力またはバッチ処理のための実行スクリプト*
-```
+
 
 ## 2. 迎合カテゴリ定義
 
@@ -270,42 +269,17 @@ AI主語率 = AI主語文数 / 総文数
 
 **検出ルール**: 比較語（comparative_terms）と優位性語（evaluative_adjectives）の共起(あり:1、なし:0)
 
-### 3.3.12.3 謙遜を装った自慢（Humble Bragging）の改定
+##### 3.3.12.3 謙遜を装った自慢 (Humble Bragging)
 
-**v3.3定義**：
-4スロット構造による精密検出システム
+表面的謙遜の後に逆接を用いて長所を強調するパターンを検出する。
 
-**検出ルール**：
-```
-[謙遜語] + [逆接助詞] + [自己参照語] + [実績語彙]
-```
+**検出ルール**: 謙遜語(humble_phrases)と逆接助詞(contrastive_conjunctions)の共起(あり:1、なし:0)
 
-**構成要素**：
-- 謙遜語：`humble_phrases`辞書項目
-- 逆接助詞：`contrastive_conjunctions`辞書項目  
-- 自己参照語：`self_reference_words`辞書項目
-- 実績語彙：`achievement_verbs`または`achievement_nouns`辞書項目
+##### 3.3.12.4 実績の列挙 (Achievement Enumeration)
 
-**検出条件**：
-- 文内における自己参照語と実績語彙の共起が必須条件
-- 逆接助詞の文脈範囲を±20文字に制限
-- スコアリング：構成要素の一致率に応じたSoft Score（0.0-1.0）
+過去の成果・経験・業績の列挙による有能性提示を検出する。
 
-(参考)v3.2定義：
-謙遜語（humble_phrases）と逆接助詞（contrastive_conjunctions）の単純共起検出
-
-### 3.3.12.4 実績の列挙（Achievement Enumeration）の改定
-
-**v3.3定義**：
-自己参照語との共起関係を条件とする係り受け解析ベース抽出
-
-**検出ルール**：
-- `achievement_verbs`、`achievement_nouns`に対して`self_reference_words`との共起を必須条件とする
-- 係り受け解析（MeCab+CaboCha）により「一人称主語-成果述語」の構文パターンを抽出
-- 参照辞書：`achievement_verbs`、`achievement_nouns`、`self_reference_words`
-
-(参考)v3.2定義：
-`achievement_verbs`および`achievement_nouns`の出現頻度合計
+**検出ルール**: 達成動詞(achievement_verbs)と実績名詞(achievement_nouns)の累積数を加算するが、重み(3.3.12.5参照)付け後上限2.0とする。
 
 ##### 3.3.12.5 統合計算
 
@@ -467,16 +441,16 @@ Confidence = 1.0 - mean(variance(predictions))
 |-------------|---------|-----------|
 | 言語 | Python | 3.8+ |
 | 形態素解析 | MeCab | 0.996 |
-| 構文解析 | CaboCha | 0.69+ |
+| 構文解析 | CaboCha | 0.69 |
 | 文埋め込み | SimCSE (cl-tohoku/bert) | latest |
 | 深層学習 | PyTorch | 1.9+ |
 | API | FastAPI | 0.68+ |
 
 ### 7.2 性能要件
 
-- **レスポンス時間(推奨)**: 単一リクエスト処理 < 200ms
-- **スループット(推奨)**: 100 requests/sec (GPU環境)
-- **メモリ使用量(推奨)**: < 4GB (モデル含む)
+- **レスポンス時間**: 単一リクエスト処理 < 200ms
+- **スループット**: 100 requests/sec (GPU環境)
+- **メモリ使用量**: < 4GB (モデル含む)
 - **精度目標**: Macro-F1 > 0.85
 
 ### 7.3 拡張性考慮事項
@@ -555,32 +529,6 @@ print(f"平均迎合度: {stats['mean_index']}")
 print(f"カテゴリ分布: {stats['category_distribution']}")
 ```
 
-### 第11章 辞書項目一覧
-
-JAIML v3.3で使用する語彙辞書項目と対応特徴量の完全対応表を以下に示す：
-
-| 辞書項目名 | 日本語名 | 関連特徴量 |
-|-----------|----------|------------|
-| `achievement_nouns` | 実績名詞 | self_promotion_intensity |
-| `achievement_verbs` | 達成動詞 | self_promotion_intensity |
-| `comparative_terms` | 比較語 | self_promotion_intensity |
-| `contrastive_conjunctions` | 逆接助詞 | self_promotion_intensity |
-| `evaluative_adjectives` | 評価形容詞 | self_ref_pos_score, self_promotion_intensity |
-| `humble_phrases` | 謙遜語 | self_promotion_intensity |
-| `intensifiers` | 強調副詞 | sentiment_emphasis_score |
-| `modal_expressions` | 推量表現 | modal_expression_ratio |
-| `positive_emotion_words` | 肯定的感情語 | sentiment_emphasis_score |
-| `self_reference_words` | 自己参照語 | ai_subject_ratio, self_ref_pos_score, self_promotion_intensity |
-| `template_phrases` | 定型句 | template_match_rate |
-
 ---
 
 本仕様書は、JAIMLシステムの技術的要求事項を包括的に定義したものである。実装にあたっては、各セクションの詳細設計に従い、段階的な開発とテストを推奨する。
-
-### 更新概要
-
-JAIML v3.2からv3.3への主要変更点は以下の通りである：
-
-1. **特徴量計算ルールの精緻化**：謙遜装い自慢および実績列挙の検出ルールを強化
-2. **語彙辞書使用項目の明示**：SRSにおける辞書項目の完全な対応関係を記述
-3. **辞書項目一覧の追加**：第11章として体系的な辞書定義を新設

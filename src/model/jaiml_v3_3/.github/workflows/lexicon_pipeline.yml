@@ -1,0 +1,46 @@
+name: Lexicon Pipeline
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # 月次実行
+  workflow_dispatch:
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m unidic download
+          
+      - name: Extract candidates
+        run: |
+          python scripts/run_expansion.py --phase extract
+          
+      - name: Upload candidates
+        uses: actions/upload-artifact@v3
+        with:
+          name: candidates
+          path: outputs/candidates/
+          
+  validate:
+    needs: extract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate structure
+        run: |
+          python scripts/run_expansion.py --phase validate
+          
+      - name: Generate review report
+        run: |
+          python scripts/generate_report.py \
+            --candidates outputs/candidates/ \
+            --output reports/review_needed.md

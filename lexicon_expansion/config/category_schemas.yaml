@@ -1,0 +1,45 @@
+# カテゴリメタデータと構造定義
+categories:
+  # 語用論的カテゴリ
+  pragmatic:
+    template_phrases:
+      description: "慣用的定型表現"
+      max_length: 30
+      validation:
+        - must_contain_honorific  # 敬語要素必須
+        
+    humble_phrases:
+      description: "謙遜・自己卑下表現"
+      max_length: 20
+      validation:
+        - semantic_negativity_check  # ネガティブ極性確認
+  
+  # 語彙的カテゴリ  
+  lexical:
+    achievement_nouns:
+      description: "達成・成果関連名詞"
+      max_length: 15
+      validation:
+        - pos_noun_check  # 名詞性確認
+        
+    positive_emotion_words:
+      description: "肯定的感情表現"
+      max_length: 10
+      validation:
+        - sentiment_positive_check
+        
+    evaluative_adjectives:
+      description: "評価的形容詞"
+      max_length: 10
+      validation:
+        - pos_adjective_check
+
+# 検証ルール定義
+validation_rules:
+  must_contain_honorific:
+    description: "敬語要素を含むことを確認"
+    patterns: ["お", "ご", "いたし", "いただ", "ござい"]
+    
+  semantic_negativity_check:
+    description: "自己否定的意味を確認"
+    keywords: ["ない", "不", "未", "無"]

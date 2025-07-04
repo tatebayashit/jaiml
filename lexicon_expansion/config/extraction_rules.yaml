@@ -1,0 +1,36 @@
+template_phrases:
+  patterns:
+    - regex: "ご.*ありがとうございます"
+      min_frequency: 10
+    - regex: "お.*いたします"
+      min_frequency: 15
+    - regex: ".*させていただ.*"
+      min_frequency: 20
+  ngram_range: [3, 7]
+  pos_filter: ["名詞", "動詞", "助動詞"]
+
+humble_phrases:
+  patterns:
+    - regex: "(まだまだ|不完全|未熟)"
+      min_frequency: 5
+    - regex: ".*ながら"
+      min_frequency: 10
+  ngram_range: [2, 5]
+  
+achievement_nouns:
+  pos_sequences:
+    - ["名詞-サ変接続", "動詞-自立"]     # 達成する
+    - ["名詞-一般", "名詞-サ変接続"]     # 成果達成
+    - ["名詞-一般", "助詞-格助詞", "名詞-サ変接続"]  # 目標の達成
+  patterns:
+    - keywords: ["受賞", "達成", "成功", "獲得", "実績", "成果"]
+  ngram_range: [1, 4]
+  min_frequency: 5
+
+evaluative_adjectives:
+  pos_sequences:
+    - ["副詞-一般", "形容詞-自立"]       # とても素晴らしい
+    - ["形容詞-自立", "名詞-非自立"]     # 優れた点
+    - ["連体詞", "形容詞-自立"]          # この素晴らしい
+  ngram_range: [1, 3]
+  min_frequency: 10

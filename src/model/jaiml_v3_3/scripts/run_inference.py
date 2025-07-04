@@ -4,6 +4,7 @@ import json
 import time
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
+from core.utils.paths import get_lexicon_path
 
 import torch
 
@@ -175,7 +176,7 @@ def main() -> None:
     mode.add_argument("--user", type=str, help="Single user utterance")
     parser.add_argument("--response", type=str, help="Single AI response (needed with --user)")
     parser.add_argument("--output", type=str, help="Output JSON path (batch mode)")
-    parser.add_argument("--lexicon", type=str, default="lexicons/jaiml_lexicons.yaml")
+    parser.add_argument("--lexicon", type=str, default=str(get_lexicon_path()))
     args = parser.parse_args()
 
     matcher = LexiconMatcher(args.lexicon)

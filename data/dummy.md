@@ -8,98 +8,89 @@
 
 
 
-うん、**完全に可能**だよ。むしろこのタイミングでやっておくべき統合修正だね。
+🧾 指示
+以下のリファクタリングを実施せよ。
 
----
+「JAIML本体用辞書拡張システム」のソースコード内における参照パスが混乱している。
+ソースコード全体を精査し、下記「望ましいディレクトリ構造」にて正常に動作するように、
+「JAIML本体用辞書拡張システム」のソースコードを書き換えよ。
+※「JAIML本体用辞書拡張システム」=「JAIML本体」で使用する辞書(`jaiml_lexicons.yaml`)を拡張するシステム
 
-## ✅ 状況の整理
-
-今の意図はこうだよね：
-
-| 項目        | 内容                                                              |
-| --------- | --------------------------------------------------------------- |
-| 🎯 目的     | `lexicons/` をプロジェクト共通の **上位階層に分離し一元管理**する                       |
-| 🎯 影響範囲   | `jaiml_v3_3/` 内部にある **JAIML本体のスクリプト**すべて（特徴量抽出など）               |
-| 🎯 やりたいこと | すべてのスクリプトが、共通 `../lexicons/jaiml_lexicons.yaml` を参照するように統合命令を出す |
-| 🧱 問題点    | Claude 由来の構造混乱も整理したい（無意味な `scripts/` 多重構造など）                    |
-
----
-
-
-
-
-# JAIML v3.3 スクリプト統合構造リファクタ命令
-
-現在、JAIML v3.3のディレクトリ構造に混乱があります。以下の方針で全体を整理し、JAIML本体と辞書スクリプト群を統合的に修正してください。
-
----
-
-## 🔁 構造変更の目的
-
-1. 統合辞書 `jaiml_lexicons.yaml` ファイルを `jaiml_v3_3/` の外に移動し、すべてのバージョン・スクリプトから共通参照できるようにします。
-2. それに伴い、JAIML本体の特徴量抽出・分類スクリプトで、統合辞書参照先を新しいパスに変更してください。
-
----
-
-## 🗂 現在のディレクトリ構造
-
+## 望ましいディレクトリ構造
 ```
 jaiml
 ├── docs
-│   └── jaiml_SRS.md                        # JAIML本体SRS
-└── src/model/jaiml_v3_3                    # JAIML本体
-                ├── core
-                ├── data
-                ├── lexicons
-                │   ├── jaiml_lexicons.yaml # 統合辞書(これが移動する)
-                │   └── matcher.py          # LexiconMatcherクラス
-                ├── outputs
-                ├── scripts
-                ├── tests
-                ├── README.md
-                └── requirements.txt
-```
-
-## 🗂 新しいディレクトリ構造
-
-```
-jaiml
-├── docs
-│   └── jaiml_SRS.md                        # JAIML本体SRS
+│   ├── jaiml_SRS.md                #JAIML本体SRS
+│   ├── lexicon_expansion_SRS.md    #JAIML本体用辞書拡張システムSRS
+│   └── lexicon_expansion_USAGE.md  #JAIML本体用辞書拡張システム取扱説明書
 ├── lexicons
-│   └── jaiml_lexicons.yaml                 # 統合辞書(これが移動する)
-└── src/model/jaiml_v3_3                    # JAIML本体
-                ├── core
-                ├── data
-                ├── lexicons
-                │   └── matcher.py          # LexiconMatcherクラス
-                ├── outputs
-                ├── scripts
-                ├── tests
-                ├── README.md
-                └── requirements.txt
+│   └── jaiml_lexicons.yaml         #JAIML本体用辞書
+└── src
+    ├── lexicon_expansion           #JAIML本体用辞書拡張システム
+    └── model
+        └── jaiml_v3_3              #JAIML本体
 ```
 
+## ✅ 具体的なタスク
+
+**`lexicon_expansion/` 以下の全面的な整理**
+以下を主軸に：
+
+### 1. **ソースコード内の参照パスの修正**
+    ただし、`jaiml_lexicons.yaml`については、可能であれば、パス参照に `Path.resolve()` を使って**可搬性のある構成**に改善せよ。
+
+### 2. **importミスの訂正(あれば)**
+
+### 3. **不要ファイル・重複定義の洗い出し**
+
+→ 仮ファイル、初期版スクリプトの残骸など
+
 ---
 
-## 🔧 修正対象のスクリプトと対応内容
+## 🧹Claudeに依頼する内容（構成）
 
-`jaiml_v3_3/`内のスクリプト全ての該当箇所を指摘し、差分を提示せよ。
-
----
-
-## 📎 その他の条件
-
-- 変更後も相対パスで呼び出し可能にしてください（絶対パス禁止）
-- デフォルト辞書ファイル名は変更しない（`jaiml_lexicons.yaml`）
-- バージョンごとの分岐時にも辞書の整合性が保たれるよう構造化してください
+次にClaudeに依頼する際は、以下のようにまとめるとよい：
 
 ---
 
-## 🎯 出力形式（期待する応答）
+### 🧾 タスク指示テンプレ
 
-- 修正されたスクリプトの該当行（差分形式）  
-- 変更の影響がある関数・クラスの一覧と説明  
-- 必要であれば補助スクリプト（例：`get_lexicon_path()`関数）も提案してください
+> 以下のリファクタリングを行ってください：
+>
+> 1. `jaiml_v3_3/lexicons/` → `../lexicons/` への辞書移行を反映し、**全スクリプトで読み込みパスを修正**してください。
+> 2. `LexiconMatcher` は `jaiml_v3_3/src/common/lexicon/matcher.py` に移動したため、**インポート定義をすべて更新**してください。
+> 3. プロジェクト全体を整理し、以下を洗い出してください：
+>
+> * 不要・未使用スクリプト
+> * 古い辞書読み込みロジック（`yaml.load()`やハードパスなど）
+> * `sys.path.append()` による一時対応の除去可能箇所
+>
+> 4. 可能であれば、パス参照に `Path.resolve()` を使って**可搬性のある構成**に改善してください。
+>
+> 🎯注意：辞書ファイルはすべて `../lexicons/jaiml_lexicons.yaml` に一本化されています。
 
-```
+---
+
+このあと手が空いたら、該当ディレクトリ構成のメモや現状の`run_expansion.py`なども貼ってくれれば、こちらでも補助できるよ。
+
+焦らず、気が向いたタイミングでまた声をかけて。待ってるよ。
+
+
+jaiml_v3_3/
+├── lexicon_expansion/
+│   ├── scripts/        # 実行スクリプト群
+│   │   ├── run_expansion.py         # メイン実行スクリプト
+│   │   └── run_advanced_features.py # 高度機能スクリプト
+│   ├── config/         # 設定ファイル
+│   │   ├── extraction_rules.yaml    # 抽出ルール
+│   │   └── category_schemas.yaml    # カテゴリ定義
+│   ├── corpus/         # 入力コーパス
+│   └── outputs/        # 出力ディレクトリ
+│       ├── candidates/ # 抽出候補
+│       ├── reports/    # レポート類
+│       └── snippets/   # スニペット
+├── lexicons/          # 辞書本体
+│   ├── jaiml_lexicons.yaml  # マスター辞書
+│   ├── versions/            # バージョン履歴
+│   └── categories/          # カテゴリ別辞書
+└── docs/              # ドキュメント

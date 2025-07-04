@@ -386,24 +386,7 @@ grep -A 2 "phrase:" candidates_*.yaml | grep -E "(phrase:|frequency:)"
 ## 6. 付録：ディレクトリ構成の説明
 
 ```
-jaiml_v3_3/
-├── lexicon_expansion/
-│   ├── scripts/        # 実行スクリプト群
-│   │   ├── run_expansion.py         # メイン実行スクリプト
-│   │   └── run_advanced_features.py # 高度機能スクリプト
-│   ├── config/         # 設定ファイル
-│   │   ├── extraction_rules.yaml    # 抽出ルール
-│   │   └── category_schemas.yaml    # カテゴリ定義
-│   ├── corpus/         # 入力コーパス
-│   └── outputs/        # 出力ディレクトリ
-│       ├── candidates/ # 抽出候補
-│       ├── reports/    # レポート類
-│       └── snippets/   # スニペット
-├── lexicons/          # 辞書本体
-│   ├── jaiml_lexicons.yaml  # マスター辞書
-│   ├── versions/            # バージョン履歴
-│   └── categories/          # カテゴリ別辞書
-└── docs/              # ドキュメント
+現在整理中
 ```
 
 ### 主要ファイルの役割

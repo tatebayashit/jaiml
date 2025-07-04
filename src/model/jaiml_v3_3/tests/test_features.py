@@ -5,9 +5,15 @@ from core.features.lexical import sentiment_emphasis_score, user_repetition_rati
 from core.features.syntactic import modal_expression_ratio, assertiveness_score, ai_subject_ratio
 from core.utils.tokenize import mecab_tokenize, extract_content_words
 
+import sys
+from pathlib import Path
+# プロジェクトルートをPythonパスに追加（テスト実行時の相対インポート対応）
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from core.utils.paths import get_lexicon_path
+
 class TestFeatures(unittest.TestCase):
     def setUp(self):
-        self.matcher = LexiconMatcher("lexicons/jaiml_lexicons.yaml")
+        self.matcher = LexiconMatcher(str(get_lexicon_path()))
 
     def test_lexicon_matcher(self):
         text = "私はすばらしい実績を達成した。"

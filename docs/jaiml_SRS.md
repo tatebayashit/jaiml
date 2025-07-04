@@ -35,6 +35,8 @@ Transformer Encoder（BERT系日本語モデル）
 本実装では、スコア算出・分類・辞書処理・入出力を以下のような構成で管理することを想定しているが、必ずしも下記構造を強制するものではない。
 
 ```
+lexicons/jaiml_lexicons.yaml  # 辞書リスト(プロジェクトルート下)
+
 src/model/jaiml_v3_3/
 ├── README.md                 # 取扱説明書
 │
@@ -50,8 +52,7 @@ src/model/jaiml_v3_3/
 │   └── utils/                # 補助関数（前処理・正規化など）
 │       └── tokenizer.py
 │
-├── lexicons/                 # 辞書定義とマッチャー
-│   ├── jaiml_lexicons.yaml   # 辞書リスト
+├── lexicons/                 # 辞書マッチャー
 │   └── matcher.py            # LexiconMatcherクラス
 │
 ├── data/                     # 学習・評価データ

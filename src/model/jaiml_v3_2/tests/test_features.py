@@ -50,13 +50,37 @@ class TestFeatures(unittest.TestCase):
 
     def test_response_dependency_content_words(self):
         """内容語ベースの応答依存度テスト"""
-        user = "最新のAI技術について教えて"
-        resp = "AI技術は急速に発展しています"
+        # 内容語が重複するケース
+        user = "今日は天気が良い"
+        resp = "天気が良いですね"
         dep = response_dependency(user, resp)
-        # 共通内容語：AI、技術
+        # 「天気」「良い」が共通内容語
         self.assertGreater(dep, 0.0)
         self.assertLess(dep, 1.0)
+        
+        # 内容語が重複しないケース
+        user = "朝食を食べた"
+        resp = "こんにちは"
+        dep = response_dependency(user, resp)
+        self.assertEqual(dep, 0.0)
 
+    def test_tfidf_novelty_integration(self):
+        """TF-IDF情報加算率の統合テスト"""
+        from core.features.corpus_based import TFIDFNoveltyCalculator
+        calc = TFIDFNoveltyCalculator()
+        
+        # 新規情報が少ないケース
+        user = "天気について教えて"
+        resp = "天気について説明します"
+        novelty = calc.compute(user, resp)
+        self.assertLess(novelty, 0.5)
+        
+        # 新規情報が多いケース
+        user = "今日"
+        resp = "気温は15度で晴れ、風速3メートル"
+        novelty = calc.compute(user, resp)
+        self.assertGreater(novelty, 0.5)
+        
     def test_lexical_diversity_morpheme_based(self):
         """形態素ベースの語彙多様性テスト"""
         resp = "素晴らしい素晴らしい本当に素晴らしい成果です"

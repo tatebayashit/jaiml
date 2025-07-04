@@ -1,7 +1,12 @@
 # src/model/jaiml_v3_2/core/features/lexical.py
 import re
+from typing import Set
+import fugashi
 from lexicons.matcher import LexiconMatcher
-from core.utils.tokenize import mecab_tokenize, extract_content_words
+from core.utils.tokenize import mecab_tokenize
+
+# 形態素解析器の初期化（モジュールレベルで一度だけ）
+_tagger = fugashi.Tagger()
 
 def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher) -> float:
     """
@@ -22,36 +27,51 @@ def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher
 
 def user_repetition_ratio(user_text: str, response_text: str) -> float:
     """
-    Jaccard similarity of user and AI vocabulary (by morphemes).
-    形態素解析により語彙単位でJaccard係数を計算する。
+    文字レベルのJaccard類似度を算出する（既存実装を維持）。
     """
     if not user_text or not response_text:
         return 0.0
-    
-    # MeCabによる形態素解析
-    user_tokens = set(mecab_tokenize(user_text))
-    resp_tokens = set(mecab_tokenize(response_text))
-    
-    intersection = user_tokens.intersection(resp_tokens)
-    union = user_tokens.union(resp_tokens)
-    
+    set_user = set(user_text)
+    set_resp = set(response_text)
+    intersection = set_user.intersection(set_resp)
+    union = set_user.union(set_resp)
     return float(len(intersection) / len(union)) if union else 0.0
 
 def response_dependency(user_text: str, response_text: str) -> float:
     """
-    Jaccard of content words (名詞・動詞・形容詞) between user and response.
-    内容語のみを対象とした語彙依存度を計算する。
+    内容語（名詞・動詞・形容詞）に限定したJaccard類似度を算出する。
+    
+    Args:
+        user_text: ユーザー発話テキスト
+        response_text: AI応答テキスト
+    
+    Returns:
+        float: 内容語ベースのJaccard係数 [0.0, 1.0]
     """
     if not user_text or not response_text:
         return 0.0
     
-    # 内容語のみを抽出
-    user_content = set(extract_content_words(user_text))
-    resp_content = set(extract_content_words(response_text))
+    def extract_content_words(text: str) -> Set[str]:
+        """内容語（名詞・動詞・形容詞）を抽出する。"""
+        content_words = set()
+        # fugashiによる形態素解析
+        for word in _tagger(text):
+            pos = word.pos.split(',')[0]  # 品詞の大分類
+            # 名詞・動詞・形容詞を内容語とする
+            if pos in ['名詞', '動詞', '形容詞']:
+                # 表層形を使用（基本形でも可）
+                content_words.add(word.surface)
+        return content_words
     
-    if not user_content or not resp_content:
+    # 内容語集合の抽出
+    user_content = extract_content_words(user_text)
+    resp_content = extract_content_words(response_text)
+    
+    # 空集合の場合の処理
+    if not user_content and not resp_content:
         return 0.0
     
+    # Jaccard係数の算出
     intersection = user_content.intersection(resp_content)
     union = user_content.union(resp_content)
     

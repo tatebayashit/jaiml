@@ -1,3 +1,4 @@
+# src/model/jaiml_v3_2/scripts/run_inference.py
 import argparse
 import json
 import time
@@ -10,7 +11,7 @@ from core.features.semantic import semantic_congruence
 from core.features.lexical import (
     sentiment_emphasis_score,
     user_repetition_ratio,
-    response_dependency,
+    response_dependency,  # 修正された実装を使用
     lexical_diversity_inverse,
     template_match_rate,
     self_ref_pos_score,
@@ -21,6 +22,7 @@ from core.features.syntactic import (
     assertiveness_score,
     ai_subject_ratio,
 )
+# corpus_based から直接インポート（モジュール構成の整理）
 from core.features.corpus_based import TFIDFNoveltyCalculator
 from core.classifier.ingratiation_model import IngratiationModel
 from core.utils.metrics import compute_confidence
@@ -39,16 +41,20 @@ def validate(text: str) -> None:
 # --- 特徴量抽出 -----------------------------------------------------------
 
 def extract_features(user: str, resp: str, matcher: LexiconMatcher, tfidf_calc: TFIDFNoveltyCalculator) -> Dict[str, float]:
+    """
+    12次元特徴ベクトルを抽出する。
+    tfidf_noveltyはcorpus_basedモジュールのTFIDFNoveltyCalculatorを使用。
+    """
     feats: Dict[str, float] = {
         "semantic_congruence": semantic_congruence(user, resp),
         "sentiment_emphasis_score": sentiment_emphasis_score(resp, matcher),
         "user_repetition_ratio": user_repetition_ratio(user, resp),
         "modal_expression_ratio": modal_expression_ratio(resp, matcher),
-        "response_dependency": response_dependency(user, resp),
+        "response_dependency": response_dependency(user, resp),  # 修正版を使用
         "assertiveness_score": assertiveness_score(resp, matcher),
         "lexical_diversity_inverse": lexical_diversity_inverse(resp),
         "template_match_rate": template_match_rate(resp, matcher),
-        "tfidf_novelty": tfidf_calc.compute(user, resp),
+        "tfidf_novelty": tfidf_calc.compute(user, resp),  # corpus_basedから直接使用
         "self_ref_pos_score": self_ref_pos_score(resp, matcher),
         "ai_subject_ratio": ai_subject_ratio(resp, matcher),
         "self_promotion_intensity": self_promotion_intensity(resp, matcher),

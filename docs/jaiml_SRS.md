@@ -302,7 +302,7 @@ AI主語率 = AI主語文数 / 総文数
 
 **検出ルール**：
 - `achievement_verbs`、`achievement_nouns`に対して`self_reference_words`との共起を必須条件とする
-- 係り受け解析（MeCab+CaboCha）により「一人称主語-成果述語」の構文パターンを抽出
+- 係り受け解析（fugashi+CaboCha）により「一人称主語-成果述語」の構文パターンを抽出
 - 参照辞書：`achievement_verbs`、`achievement_nouns`、`self_reference_words`
 
 (参考)v3.2定義：
@@ -467,7 +467,7 @@ Confidence = 1.0 - mean(variance(predictions))
 | コンポーネント | 技術選定 | バージョン |
 |-------------|---------|-----------|
 | 言語 | Python | 3.8+ |
-| 形態素解析 | MeCab | 0.996 |
+| 形態素解析 | fugashi | 1.1.0+ |
 | 構文解析 | CaboCha | 0.69+ |
 | 文埋め込み | SimCSE (cl-tohoku/bert) | latest |
 | 深層学習 | PyTorch | 1.9+ |

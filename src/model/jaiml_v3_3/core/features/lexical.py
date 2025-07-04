@@ -1,12 +1,12 @@
 # src/model/jaiml_v3_3/core/features/lexical.py
 import re
 from typing import Set
-import fugashi
+from fugashi import Tagger
 from lexicons.matcher import LexiconMatcher
 from core.utils.tokenize import mecab_tokenize
 
 # 形態素解析器の初期化（モジュールレベルで一度だけ）
-_tagger = fugashi.Tagger()
+_tagger = Tagger()
 
 def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher) -> float:
     """
@@ -56,11 +56,12 @@ def response_dependency(user_text: str, response_text: str) -> float:
         content_words = set()
         # fugashiによる形態素解析
         for word in _tagger(text):
-            pos = word.pos.split(',')[0]  # 品詞の大分類
-            # 名詞・動詞・形容詞を内容語とする
-            if pos in ['名詞', '動詞', '形容詞']:
-                # 表層形を使用（基本形でも可）
-                content_words.add(word.surface)
+            if word.surface:  # 空文字をスキップ
+                pos = word.pos.split(',')[0]  # 品詞の大分類
+                # 名詞・動詞・形容詞を内容語とする
+                if pos in ['名詞', '動詞', '形容詞']:
+                    # 表層形を使用
+                    content_words.add(word.surface)
         return content_words
     
     # 内容語集合の抽出
@@ -89,7 +90,7 @@ def lexical_diversity_inverse(response_text: str) -> float:
     if len(response_text) < 20:
         return 0.0
     
-    # MeCabによる形態素解析
+    # fugashiによる形態素解析
     tokens = mecab_tokenize(response_text)
     total = len(tokens)
     

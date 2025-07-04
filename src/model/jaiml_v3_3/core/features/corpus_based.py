@@ -1,4 +1,4 @@
-# src/model/jaiml_v3_2/core/features/corpus_based.py
+# src/model/jaiml_v3_3/core/features/corpus_based.py
 from typing import List, Callable
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
@@ -17,16 +17,16 @@ class TFIDFNoveltyCalculator:
     """
 
     def __init__(self):
-        # MeCabトークナイザを使用
+        # fugashiベースのトークナイザを使用
         self.vectorizer = TfidfVectorizer(
-            tokenizer=self._mecab_tokenize,
+            tokenizer=self._fugashi_tokenize,
             token_pattern=None,  # tokenizerを使用する場合は無効化
             min_df=1,
             max_df=0.9
         )
     
-    def _mecab_tokenize(self, text: str) -> List[str]:
-        """TfidfVectorizer用のトークナイザ関数。
+    def _fugashi_tokenize(self, text: str) -> List[str]:
+        """TfidfVectorizer用のfugashiベースのトークナイザ関数。
         
         Args:
             text: 入力テキスト

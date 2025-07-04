@@ -1,5 +1,5 @@
 import yaml
-import MeCab
+from fugashi import Tagger
 import re
 from pathlib import Path
 from collections import Counter
@@ -9,7 +9,7 @@ class CandidateExtractor:
     def __init__(self, config_path: str):
         with open(config_path, 'r', encoding='utf-8') as f:
             self.rules = yaml.safe_load(f)
-        self.tagger = MeCab.Tagger()
+        self.tagger = Tagger()
         
     def extract_pos_sequences(self, text: str, patterns: List[List[str]]) -> List[Tuple[str, str]]:
         """品詞列パターンに基づく抽出
@@ -17,19 +17,17 @@ class CandidateExtractor:
         Returns:
             List[Tuple[str, str]]: (表層形, 品詞列) のタプルリスト
         """
-        node = self.tagger.parseToNode(text)
         tokens, pos_tags = [], []
         
-        while node:
-            if node.surface:
-                tokens.append(node.surface)
-                features = node.feature.split(',')
+        for word in self.tagger(text):
+            if word.surface:
+                tokens.append(word.surface)
+                features = word.pos.split(',')
                 # 品詞-品詞細分類の形式で保存
                 pos = features[0]
                 if len(features) > 1 and features[1] != '*':
                     pos += f'-{features[1]}'
                 pos_tags.append(pos)
-            node = node.next
         
         matches = []
         for pattern in patterns:
@@ -56,13 +54,11 @@ class CandidateExtractor:
     
     def extract_ngrams(self, text: str, n_range: Tuple[int, int]) -> List[str]:
         """N-gram抽出"""
-        node = self.tagger.parseToNode(text)
         tokens = []
         
-        while node:
-            if node.surface:
-                tokens.append(node.surface)
-            node = node.next
+        for word in self.tagger(text):
+            if word.surface:
+                tokens.append(word.surface)
             
         ngrams = []
         for n in range(n_range[0], n_range[1] + 1):
@@ -179,14 +175,10 @@ class CandidateExtractor:
     
     def _check_pos_filter(self, text: str, pos_filter: List[str]) -> bool:
         """品詞フィルタのチェック"""
-        node = self.tagger.parseToNode(text)
-        
-        while node:
-            if node.surface:
-                features = node.feature.split(',')
+        for word in self.tagger(text):
+            if word.surface:
+                features = word.pos.split(',')
                 pos = features[0]
                 if pos in pos_filter:
                     return True
-            node = node.next
-            
         return False

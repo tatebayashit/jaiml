@@ -69,7 +69,7 @@ JAIML v3.3 において `template_phrases`, `humble_phrases`, `achievement_nouns
 ## 参照ファイル
 
 設計仕様書　`docs/jaiml_SRS.md`
-辞書ファイル　`src/model/jaiml_v3_3/jaiml_lexicons.yaml`
+辞書ファイル　`src/model/jaiml_v3_3/lexicons/jaiml_lexicons.yaml`
 
 ## 要求される構成
 

@@ -3,6 +3,7 @@ import yaml
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 import re
+from pathlib import Path
 
 @dataclass
 class AnnotationCandidate:
@@ -17,6 +18,10 @@ class AnnotationCandidate:
 
 class AutoAnnotator:
     def __init__(self, lexicon_path: str):
+        lexicon_path = Path(lexicon_path)
+        if not lexicon_path.exists():
+            raise FileNotFoundError(f"辞書ファイルが見つかりません: {lexicon_path}")
+            
         with open(lexicon_path, 'r', encoding='utf-8') as f:
             self.lexicon = yaml.safe_load(f)
         self._build_phrase_index()
@@ -25,6 +30,8 @@ class AutoAnnotator:
         """高速検索用のフレーズインデックス構築"""
         self.phrase_to_category = {}
         for category, phrases in self.lexicon.items():
+            if not isinstance(phrases, list):
+                continue
             for phrase in phrases:
                 if phrase not in self.phrase_to_category:
                     self.phrase_to_category[phrase] = []
@@ -32,6 +39,9 @@ class AutoAnnotator:
                 
     def annotate_text(self, text: str, context_window: int = 50) -> List[AnnotationCandidate]:
         """テキストの自動アノテーション"""
+        if not text:
+            return []
+            
         candidates = []
         
         # フレーズマッチング（長い順に優先）
@@ -73,7 +83,7 @@ class AutoAnnotator:
     def _calculate_confidence(self, phrase: str, text: str, 
                             start: int, end: int) -> float:
         """アノテーション信頼度の計算"""
-        # 簡易実装: フレーズ長と文脈の自然性で判定
+        # 基本信頼度：フレーズ長に基づく
         base_confidence = min(len(phrase) / 20, 1.0)
         
         # 文境界での出現は信頼度を下げる
@@ -89,8 +99,17 @@ class AutoAnnotator:
     
     def generate_training_data(self, corpus_path: str, 
                              output_path: str, 
-                             min_confidence: float = 0.7):
+                             min_confidence: float = 0.7) -> int:
         """弱教師あり学習用データの生成"""
+        corpus_path = Path(corpus_path)
+        output_path = Path(output_path)
+        
+        if not corpus_path.exists():
+            raise FileNotFoundError(f"コーパスファイルが見つかりません: {corpus_path}")
+            
+        # 出力ディレクトリの作成
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
         training_data = []
         
         with open(corpus_path, 'r', encoding='utf-8') as f:
@@ -103,7 +122,14 @@ class AutoAnnotator:
                     data = json.loads(line)
                     user_text = data.get('user', '')
                     response_text = data.get('response', '')
-                except:
+                except json.JSONDecodeError:
+                    # JSON形式でない場合はスキップ
+                    continue
+                except Exception as e:
+                    print(f"警告: 行 {line_no + 1} の処理中にエラー: {e}")
+                    continue
+                    
+                if not response_text:
                     continue
                     
                 # 応答文のアノテーション

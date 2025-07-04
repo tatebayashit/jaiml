@@ -11,7 +11,7 @@ def get_lexicon_path() -> Path:
     """
     # このファイルから4階層上がプロジェクトルート
     current_file = Path(__file__).resolve()
-    project_root = current_file.parent.parent.parent.parent.parent
+    project_root = current_file.parent.parent.parent.parent.parent.parent
     lexicon_path = project_root / "lexicons" / "jaiml_lexicons.yaml"
     
     if not lexicon_path.exists():

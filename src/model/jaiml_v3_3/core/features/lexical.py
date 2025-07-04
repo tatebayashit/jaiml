@@ -1,12 +1,12 @@
 # src/model/jaiml_v3_3/core/features/lexical.py
 import re
 from typing import Set
-import MeCab
+import fugashi
 from lexicons.matcher import LexiconMatcher
 from core.utils.tokenize import mecab_tokenize
 
 # 形態素解析器の初期化（モジュールレベルで一度だけ）
-_tagger = MeCab.Tagger()
+_tagger = fugashi.Tagger()
 
 def sentiment_emphasis_score(response_text: str, lexicon_matcher: LexiconMatcher) -> float:
     """

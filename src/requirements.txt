@@ -1,5 +1,5 @@
 # 依存パッケージ
-mecab-python3==1.0.4
+# mecab-python3==1.0.4
 unidic-lite==1.0.8
 pyyaml==6.0
 pydantic==2.5.0

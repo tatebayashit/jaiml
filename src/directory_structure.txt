@@ -1,0 +1,54 @@
+src
+├── ci
+│   ├── schema_validate.py          # tfidf_config.yaml を JSONSchema で検証
+│   └── __init__.py
+├── config
+│   ├── global.yaml                 # tokenizer, ngram_range, min_df 等を集中管理
+│   └── tfidf_config.yaml           # TF-IDF 個別パラメータ（CI により global と整合確認）
+├── lexicon_expansion
+│   └── …                           # 既存階層（変更なし、config 参照先を global.yaml に更新）
+├── model
+│   ├── jaiml_v3_3
+│   │   ├── core
+│   │   │   ├── classifier
+│   │   │   │   └── ingratiation_model.py
+│   │   │   ├── features
+│   │   │   │   ├── corpus_based.py        # load_model() 実装を追加
+│   │   │   │   ├── lexical.py
+│   │   │   │   ├── semantic.py
+│   │   │   │   └── syntactic.py
+│   │   │   └── utils
+│   │   │       ├── metrics.py
+│   │   │       ├── paths.py
+│   │   │       ├── tokenize.py            # fugashi ベース実装に統一
+│   │   │       └── tokenizer.py
+│   │   ├── data
+│   │   │   └── dev.jsonl
+│   │   ├── lexicons
+│   │   │   └── matcher.py
+│   │   ├── outputs
+│   │   │   └── sample_output.jsonl
+│   │   ├── scripts
+│   │   │   └── run_inference.py
+│   │   ├── tests
+│   │   │   └── test_features.py
+│   │   └── README.md
+│   └── vectorizers                 # 事前学習済みベクトル格納レジストリ
+│       ├── tfidf_vectorizer.joblib
+│       └── metadata.json           # sklearn_version, model_version 等
+├── vector_pretrainer
+│   ├── config
+│   │   └── tfidf_config.yaml -> ../../config/tfidf_config.yaml  # シンボリックリンク
+│   ├── corpus
+│   │   ├── raw/                    # 外部 txt, xml 等を一時保管
+│   │   └── jsonl/                  # user/response/metadata 形式に正規化後配置
+│   ├── outputs
+│   │   ├── models
+│   │   │   └── tfidf_vectorizer.joblib
+│   │   └── logs
+│   ├── scripts
+│   │   ├── train_tfidf.py          # joblib.dump(compress=3) で保存
+│   │   └── to_jsonl.py             # 1行1文→JSONL 変換ユーティリティ
+│   └── README.md
+├── requirements.txt                # joblib>=1.3, fugashi==1.3.*, scikit-learn==1.7.*
+└── README.md

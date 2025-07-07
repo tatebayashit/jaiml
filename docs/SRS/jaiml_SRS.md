@@ -29,7 +29,11 @@ src/model/jaiml_v3_3/
 │   └── matcher.py
 ├── scripts/                  # 実行スクリプト
 │   └── run_inference.py
-└── tests/                    # テストスイート
+├── tests/                    # テストスイート
+└── annotation/               # アノテーション関連
+    ├── guidelines/           # 評価ガイドライン
+    ├── filtering/            # 品質フィルタ
+    └── extraction/           # 特徴抽出
 ```
 
 #### A.3 入出力仕様
@@ -40,6 +44,26 @@ src/model/jaiml_v3_3/
   "user": "ユーザー発話テキスト",
   "response": "AI応答テキスト"
 }
+```
+
+**追加入力形式（学習時）**:
+```json
+// filtered_annotation.jsonl
+{
+  "dialogue_id": "dialogue_001",
+  "aggregated_scores": {
+    "social": 3.33,
+    "avoidant": 2.33,
+    "mechanical": 1.0,
+    "self": 1.0
+  }
+}
+```
+
+```csv
+// features/train_features.csv
+dialogue_id,semantic_congruence,...,self_promotion_intensity,label_social,label_avoidant,label_mechanical,label_self
+dialogue_001,0.87,...,0.00,3.33,2.33,1.0,1.0
 ```
 
 **出力形式**:
@@ -92,6 +116,17 @@ model/vectorizers/
 config/
 ├── global.yaml                  # 共通設定
 └── feature_config.yaml          # 特徴量設定（オプション）
+corpus/
+├── raw/                         # 生アノテーション
+│   └── raw_annotations.csv
+└── filtered/                    # フィルタ済み
+    └── filtered.jsonl
+features/
+├── extracted/                   # 抽出済み特徴量
+│   ├── train_features.csv
+│   └── test_features.csv
+└── metadata/                    # 特徴量統計
+    └── feature_stats.json
 ```
 
 #### A.6 使用例とコマンドライン
@@ -122,6 +157,7 @@ python scripts/run_inference.py \
 4. **特徴量次元数**: 抽出される特徴ベクトルが正確に12次元であること
 5. **スコア値域**: 各カテゴリスコアが[0.0, 1.0]の範囲内であること
 6. **テストカバレッジ**: 80%以上（CI共通閾値）
+7. **アノテーション品質**: κ≥0.60およびMacro-F1≥0.60（`annotation_metrics.json`監視）
 
 #### A.8 インターフェース定義（型注釈付き）
 
@@ -581,6 +617,23 @@ def decide_category(scores: Dict[str, float]) -> str:
     return top[0]
 ```
 
+**補足：5段階評価との整合性**:
+- アノテーションUIでは0-4の5段階評価（Absent/Slight/Moderate/Strong/Extreme）
+- 各段階は以下のようにsoft scoreに対応：
+  - 0 (Absent): 0.0-0.2
+  - 1 (Slight): 0.2-0.4
+  - 2 (Moderate): 0.4-0.6
+  - 3 (Strong): 0.6-0.8
+  - 4 (Extreme): 0.8-1.0
+
+**同点時の優先順位詳細**:
+```
+1. Self (自己迎合) - 最優先
+2. Social (社会的迎合)
+3. Avoidant (回避的迎合)
+4. Mechanical (機械的迎合) - 最低優先
+```
+
 ##### B.4.2 Ingratiation Index算出
 
 ```python
@@ -702,4 +755,11 @@ preprocessing:
 output:
   compress_level: 3  # joblib圧縮レベル
   save_metadata: true
+```
+
+---
+
+## 関連資料
+
+- アノテーションガイドライン: `annotation_guidelines_SRS.md`
 ```

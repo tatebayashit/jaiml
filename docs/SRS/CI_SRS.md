@@ -19,6 +19,7 @@ src/ci/
 ├── check_jsonl.py               # JSONL形式検証
 ├── anonymization_check.py       # 匿名化処理検証
 ├── check_cluster_quality.py     # クラスタリング品質検証
+├── check_annotation_metrics.py  # アノテーション品質メトリクス検証
 └── run_all_checks.py            # 統合実行スクリプト
 
 .github/workflows/
@@ -108,6 +109,9 @@ python ci/run_all_checks.py --output-format json
 9. **辞書ハッシュ整合性**: changelog記載のハッシュと実ファイルの一致
 10. **TF-IDF再現性**: 同一入力から同一noveltyスコア
 11. **匿名化処理**: 個人情報の適切なマスキング
+12. **アノテーションログ整合性**: JSONスキーマ準拠とタイムスタンプ論理性
+13. **UI仕様整合性**: アノテーション定義との表示要素の一致
+14. **アノテーション品質**: Weighted-κ ≥ 0.60, Macro-F1 ≥ 0.60
 
 #### A.8 インターフェース定義（型注釈付き）
 
@@ -152,7 +156,17 @@ class AnonymizationChecker:
 
 class LexiconValidator:
     def check_canonical_keys(self, lexicon_path: str) -> ValidationResult:
-        """canonical_keyの正規化ルール準拠を検証"""        
+        """canonical_keyの正規化ルール準拠を検証"""
+
+class AnnotationQualityChecker:
+    def check_annotation_metrics(self, annotation_file: str) -> ValidationResult:
+        """アノテーション品質メトリクスの検証"""
+    
+    def validate_annotation_logs(self, log_dir: str) -> ValidationResult:
+        """アノテーションログのスキーマ準拠性検証"""
+    
+    def check_ui_consistency(self, snapshot_file: str) -> ValidationResult:
+        """UI仕様とアノテーション定義の整合性検証"""      
 ```
 
 #### A.9 既知の制約と注意事項
@@ -714,7 +728,19 @@ if __name__ == '__main__':
     main()
 ```
 
-##### B.1.10 Nightly Annotation Quality Job
+#### B.1.10 CI検証項目テーブル
+
+| 検証項目 | 実行スクリプト | 検証内容 | 失敗条件 |
+|----------|---------------|----------|----------|
+| アノテーション品質 | `check_annotation_metrics.py` | 評価者間一致率とF1スコア | κ<0.60 or Macro-F1<0.60 |
+| アノテーション完全性 | `check_annotation_metrics.py` | 必須軸の評価存在 | 4軸いずれかの欠損 |
+| 評価者数 | `check_annotation_metrics.py` | 最小評価者数確認 | <3人/対話 |
+| 時系列一貫性 | `check_annotation_metrics.py` | 評価時期の妥当性 | 未来日付の検出 |
+| ログスキーマ準拠性 | `validate_annotation_logs.py` | JSONスキーマ検証 | スキーマ違反 |
+| ログ時刻論理性 | `validate_annotation_logs.py` | タイムスタンプ整合性 | 差分>0.1秒 |
+| UI定義整合性 | `check_ui_consistency.py` | ラベル・スケール一致 | 不一致検出 |
+
+##### B.1.11 Nightly Annotation Quality Job
 
 ```yaml
 # .github/workflows/annotation_quality.yml
@@ -747,6 +773,12 @@ jobs:
           --annotation-file corpus/annotations/pilot_annotations.json \
           --output-format json > annotation_metrics.json
     
+     - name: Validate annotation logs
+      run: python src/ci/validate_annotation_logs.py --log-dir annotation/logs/current/
+    
+    - name: Check UI consistency
+      run: python src/ci/check_ui_consistency.py --snapshot-file ci/snapshots/ui_spec.json   
+    
     - name: Upload metrics report
       uses: actions/upload-artifact@v3
       with:
@@ -761,6 +793,135 @@ jobs:
         text: 'Annotation quality check detected issues. Please review the metrics.'
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+```
+
+##### B.1.12 アノテーションログ検証
+
+```python
+def validate_annotation_logs(log_dir: str) -> ValidationResult:
+    """アノテーションログのJSONスキーマ準拠性を検証"""
+    errors = []
+    warnings = []
+    
+    schema = {
+        "type": "object",
+        "required": [
+            "annotator_id", "target_id", "scores", 
+            "timestamp_start", "timestamp_end", "annotation_duration",
+            "is_modified", "browser_meta", "confidence_flag"
+        ],
+        "properties": {
+            "annotator_id": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+            "target_id": {"type": "string", "format": "uuid"},
+            "scores": {
+                "type": "object",
+                "required": ["social", "avoidant", "mechanical", "self"],
+                "properties": {
+                    "social": {"type": "integer", "minimum": 0, "maximum": 4},
+                    "avoidant": {"type": "integer", "minimum": 0, "maximum": 4},
+                    "mechanical": {"type": "integer", "minimum": 0, "maximum": 4},
+                    "self": {"type": "integer", "minimum": 0, "maximum": 4}
+                }
+            }
+        }
+    }
+    
+    for log_file in glob.glob(os.path.join(log_dir, "*.jsonl")):
+        with open(log_file, 'r') as f:
+            for line_no, line in enumerate(f, 1):
+                try:
+                    record = json.loads(line)
+                    jsonschema.validate(record, schema)
+                    
+                    # タイムスタンプ論理性チェック
+                    start = datetime.fromisoformat(record['timestamp_start'])
+                    end = datetime.fromisoformat(record['timestamp_end'])
+                    duration = record['annotation_duration']
+                    
+                    calculated = (end - start).total_seconds()
+                    if abs(calculated - duration) > 0.1:
+                        warnings.append(
+                            f"{log_file}:{line_no}: Duration mismatch "
+                            f"(calculated: {calculated}, recorded: {duration})"
+                        )
+                        
+                except json.JSONDecodeError as e:
+                    errors.append(f"{log_file}:{line_no}: Invalid JSON - {e}")
+                except jsonschema.ValidationError as e:
+                    errors.append(f"{log_file}:{line_no}: Schema violation - {e}")
+    
+    return ValidationResult(
+        passed=len(errors) == 0,
+        errors=errors,
+        warnings=warnings,
+        info={'files_checked': len(list(glob.glob(os.path.join(log_dir, "*.jsonl"))))}
+    )
+```
+
+##### B.1.13 UI整合性チェック
+
+```python
+def check_ui_consistency(snapshot_file: str = "ci/snapshots/ui_spec.json") -> ValidationResult:
+    """UI要素とアノテーション定義の整合性を検証"""
+    errors = []
+    
+    # UIスナップショット読み込み
+    if not os.path.exists(snapshot_file):
+        return ValidationResult(
+            passed=False,
+            errors=[f"UI snapshot not found: {snapshot_file}"],
+            warnings=[],
+            info={}
+        )
+    
+    with open(snapshot_file, 'r') as f:
+        ui_spec = json.load(f)
+    
+    # 期待される要素
+    expected_axes = ['social', 'avoidant', 'mechanical', 'self']
+    expected_labels = {
+        'social': '社会的迎合',
+        'avoidant': '回避的迎合',
+        'mechanical': '機械的迎合',
+        'self': '自己迎合'
+    }
+    expected_scale = {
+        0: 'なし',
+        1: 'わずか',
+        2: '中程度',
+        3: '強い',
+        4: '極度'
+    }
+    
+    # UIスナップショットとの照合
+    ui_axes = ui_spec.get('score_inputs', {})
+    for axis in expected_axes:
+        if axis not in ui_axes:
+            errors.append(f"Missing UI element for axis: {axis}")
+        else:
+            # ラベルチェック
+            if ui_axes[axis].get('label') != expected_labels[axis]:
+                errors.append(
+                    f"Label mismatch for {axis}: "
+                    f"expected '{expected_labels[axis]}', "
+                    f"got '{ui_axes[axis].get('label')}'"
+                )
+            
+            # スケールチェック
+            ui_options = ui_axes[axis].get('options', {})
+            for value, label in expected_scale.items():
+                if str(value) not in ui_options or ui_options[str(value)] != label:
+                    errors.append(
+                        f"Scale mismatch for {axis}[{value}]: "
+                        f"expected '{label}', got '{ui_options.get(str(value))}'"
+                    )
+    
+    return ValidationResult(
+        passed=len(errors) == 0,
+        errors=errors,
+        warnings=[],
+        info={'snapshot_timestamp': ui_spec.get('timestamp')}
+    )
 ```
 
 #### B.2 セキュリティ検査
@@ -896,6 +1057,9 @@ jobs:
 
     - name: Check anonymization
       run: python src/ci/anonymization_check.py --corpus-dir corpus/jsonl/
+
+    - name: Check annotation metrics
+      run: python src/ci/check_annotation_metrics.py --annotation-file corpus/annotations/pilot_annotations.json
     
     - name: Generate report
       if: always()
@@ -1058,4 +1222,34 @@ def validate_changelog_hash(changelog_path: str) -> ValidationResult:
         warnings=warnings,
         info={'total_versions': len(changelog.get('versions', []))}
     )
+```
+
+#### B.6 UIスナップショット仕様
+
+```json
+// ci/snapshots/ui_spec.json
+{
+  "timestamp": "2025-01-15T10:00:00Z",
+  "version": "1.0",
+  "score_inputs": {
+    "social": {
+      "label": "社会的迎合",
+      "options": {
+        "0": "なし",
+        "1": "わずか",
+        "2": "中程度",
+        "3": "強い",
+        "4": "極度"
+      }
+    },
+    "avoidant": { ... },
+    "mechanical": { ... },
+    "self": { ... }
+  },
+  "confidence_options": {
+    "certain": "確信",
+    "uncertain": "不確信"
+  },
+  "required_elements": ["dialogue_history", "current_pair", "timer_display"]
+}
 ```

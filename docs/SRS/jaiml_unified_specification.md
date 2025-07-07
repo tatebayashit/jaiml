@@ -6,11 +6,18 @@
 
 **プロジェクト名**: JAIML (Japanese AI Ingratiation Modeling Layer) 統合システム
 
-**目的**: 本仕様書は、JAIMLプロジェクトの構成要素である以下の3モジュールの整合性と連携方法を定める：
+**目的**: 本仕様書は、JAIMLプロジェクトの構成要素である以下の7モジュールの整合性と連携方法を定める：
 
 * **JAIML v3.3**：自己呈示・迎合性分類器の本体モジュール（モデル層）
 * **lexicon_expansion v2.0**：辞書拡張・スコア抽出機構（辞書層）
 * **vector_pretrainer v1.1**：コーパスベースのベクトル事前学習ユーティリティ（コーパス層）
+* **annotation_guidelines v1.0**：人手評価の標準化と品質管理（アノテーション層）
+* **annotation_filtering v1.0**：統計的信頼性に基づく高品質データ抽出（フィルタ層）
+* **feature_extraction v1.0**：12次元特徴量の抽出と正規化（特徴層）
+* **model_retraining v1.0**：教師あり学習による分類器改善（学習層）
+* **annotation_UI v1.0**：アノテーション作業用Webインターフェース（UI層）
+* **annotation_logger v1.0**：アノテーション作業ログの記録と監査（ログ層）
+* **annotation_e2e_tests v1.0**：統合システムのEnd-to-Endテスト（テスト層）
 
 **基本方針**: 全モジュールは共通設定体系（`config/global.yaml`）に準拠し、統一されたインターフェースとデータフローにより相互連携する。
 
@@ -19,9 +26,6 @@
 ```plaintext
 src/
 ├── ci/                           # CI/CD検証スクリプト群
-│   ├── schema_validate.py        # YAML設定ファイルの検証
-│   ├── check_tokenizer.py        # tokenizer統一性検査
-│   └── check_versions.py         # バージョン整合性検査
 ├── config/                       # 共通設定ディレクトリ
 │   ├── global.yaml              # 全モジュール共通設定
 │   └── tfidf_config.yaml        # TF-IDF専用設定
@@ -32,6 +36,19 @@ src/
 │       ├── tfidf_vectorizer.joblib
 │       └── metadata.json
 ├── vector_pretrainer/            # ベクトル事前学習モジュール
+├── annotation_guidelines/        # アノテーションガイドライン
+├── annotation_filtering/         # アノテーション品質フィルタ
+├── feature_extraction/           # 特徴量抽出
+├── model_retraining/            # モデル再学習
+├── annotation_ui/               # アノテーションWebUI
+│   ├── frontend/                # React/Vue.jsフロントエンド
+│   ├── backend/                 # Flask/FastAPIバックエンド
+│   └── assets/                  # 静的リソース
+├── annotation_logging/          # アノテーションログ記録
+│   ├── collectors/              # イベント収集
+│   ├── processors/              # ログ処理
+│   └── storage/                 # データ永続化
+├── e2e_tests/                   # End-to-Endテスト
 └── requirements.txt              # 依存ライブラリ定義
 ```
 
@@ -52,6 +69,41 @@ src/
    - 弱教師付き学習データの生成
    - 辞書のバージョン管理と差分追跡
 
+4. **annotation_guidelines v1.0**
+   - 4軸5段階評価の標準化と例示
+   - 評価者訓練と品質管理プロトコル
+   - Weighted-κによる一致率監視
+
+5. **annotation_filtering v1.0**
+   - κ≥0.60基準による高品質データ選別
+   - 統計的外れ値の検出と除外
+   - κ重み付き平均による統合
+
+6. **feature_extraction v1.0**
+   - アノテーション済みデータから12特徴量抽出
+   - 特徴量の正規化と欠損値処理
+   - 学習用CSV形式への変換
+
+7. **model_retraining v1.0**
+   - XGBoostによる4軸独立回帰学習
+   - ハイパーパラメータ最適化
+   - アブレーション研究と評価
+
+8. **annotation_UI v1.0**
+   - 直感的な4軸5段階評価インターフェース
+   - 7ターン対話履歴表示による文脈考慮
+   - リアルタイムバリデーションとデータ品質確保
+
+9. **annotation_logger v1.0**
+   - 全アノテーション活動の完全な監査証跡
+   - プライバシーに配慮した個人情報の匿名化
+   - モデル出力との比較分析用データ収集
+
+10. **annotation_e2e_tests v1.0**
+    - UIラベル一貫性とナビゲーションテスト
+    - ログ記録の時刻精度と整合性検証
+    - 負荷テストとセキュリティ検証
+
 #### A.3 入出力仕様
 
 **プロジェクト全体の入力**:
@@ -64,6 +116,9 @@ src/
 2. 学習済みTF-IDFモデル（joblib形式）
 3. 拡張語彙辞書（YAML形式）
 4. 弱教師付き学習データ（JSONL形式）
+5. アノテーション結果（JSON形式）
+6. アノテーションログ（JSONL形式）
+7. E2Eテストレポート（JUnit XML/HTML形式）
 
 **標準JSONLスキーマ**:
 ```json
@@ -137,6 +192,18 @@ model/vectorizers/
 ├── tfidf_vectorizer.joblib  # 学習済みTF-IDFモデル
 └── metadata.json            # モデルメタデータ
 
+annotation/
+├── logs/
+│   ├── current/             # 現在のアノテーションログ
+│   └── archive/             # アーカイブ済みログ
+├── results/                 # アノテーション結果
+└── reports/                 # 品質レポート
+
+test_results/
+├── junit/                   # JUnit形式テスト結果
+├── coverage/                # カバレッジレポート
+└── screenshots/             # E2Eテスト失敗時のスクリーンショット
+
 corpus/
 ├── raw/                     # 生コーパス
 └── jsonl/                   # 正規化済みコーパス
@@ -185,6 +252,20 @@ python src/vector_pretrainer/scripts/anonymize.py \
   --output corpus/anonymized/dialogue.jsonl \
   --model ja_ginza_electra \
   --human-review-output corpus/review/dialogue_review.csv
+
+# 6. アノテーションUIサーバー起動
+cd src/annotation_ui
+npm run dev  # フロントエンド開発サーバー
+python backend/app.py --port 8080  # バックエンドAPI
+
+# 7. アノテーションログ分析
+python src/annotation_logging/analyze.py \
+  --start-date 2025-01-01 \
+  --end-date 2025-01-31 \
+  --output reports/monthly_analysis.json
+
+# 8. E2Eテスト実行
+pytest src/e2e_tests/ --cov=annotation_system --cov-report=html
 ```
 
 **CI検証の実行**:
@@ -213,6 +294,10 @@ python src/ci/check_versions.py
 | 辞書エントリ重複 | `ci/check_lexicon.py` | カテゴリ横断の重複チェック | canonical_key重複 |
 | 辞書ハッシュ整合性 | `ci/check_lexicon_hash.py` | changelogとファイルハッシュ | 不一致 |
 | セキュリティ検査 | `ci/check_security.py` | Pickle使用・脆弱性検出 | 警告なしPickle使用 |
+| アノテーション品質 | `ci/check_annotation_metrics.py` | κとMacro-F1の監視 | κ<0.60 or F1<0.60 |
+| アノテーションログ検証 | `ci/validate_annotation_logs.py` | JSONスキーマ準拠性 | スキーマ違反 |
+| UI整合性 | `ci/check_ui_consistency.py` | UI要素とスコア定義の一致 | ラベル不一致 |
+| E2Eテスト | `ci/run_e2e_tests.py` | 統合動作検証 | テスト失敗率>0% |
 
 **GitHub Actions統合**:
 ```yaml
@@ -366,6 +451,15 @@ graph TD
     L[コーパス] -->|候補抽出| G
     G -->|辞書更新| I
     G -->|弱教師データ| M[学習データ]
+   
+    N[対話ペア] -->|人手評価| O[annotation_guidelines]
+    O -->|生データ| P[raw_annotations.csv]
+    P -->|品質フィルタ| Q[annotation_filtering]
+    Q -->|高品質データ| R[filtered.jsonl]
+    R -->|特徴抽出| S[feature_extraction]
+    S -->|特徴量CSV| T[train_features.csv]
+    T -->|学習| U[model_retraining]
+    U -->|改善モデル| E
 ```
 
 **データフローの詳細**:

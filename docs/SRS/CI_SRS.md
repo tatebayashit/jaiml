@@ -17,7 +17,7 @@ src/ci/
 ├── check_versions.py            # バージョン整合性検査
 ├── check_security.py            # セキュリティ検査
 ├── check_jsonl.py               # JSONL形式検証
-├── anonymization_check.py       # 匿名化処理検証
+├── check_anonymization.py       # 匿名化処理検証
 ├── check_cluster_quality.py     # クラスタリング品質検証
 ├── check_annotation_metrics.py  # アノテーション品質メトリクス検証
 └── run_all_checks.py            # 統合実行スクリプト
@@ -83,7 +83,7 @@ python ci/check_tokenizer.py
 python ci/check_security.py
 
 # 匿名化検証
-python ci/anonymization_check.py --corpus-dir corpus/jsonl/
+python ci/check_anonymization.py --corpus-dir corpus/jsonl/
 
 # クラスタリング品質検証
 python ci/check_cluster_quality.py --metrics-file outputs/reports/cluster_metrics.json
@@ -407,7 +407,7 @@ def scan_unmasked_patterns(corpus_dir: str) -> ValidationResult:
 ##### B.1.5 統合匿名化検証スクリプト
 
 ```python
-# ci/anonymization_check.py
+# ci/check_anonymization.py
 import argparse
 import json
 import sys
@@ -1056,7 +1056,7 @@ jobs:
       run: python src/ci/check_versions.py
 
     - name: Check anonymization
-      run: python src/ci/anonymization_check.py --corpus-dir corpus/jsonl/
+      run: python src/ci/check_anonymization.py --corpus-dir corpus/jsonl/
 
     - name: Check annotation metrics
       run: python src/ci/check_annotation_metrics.py --annotation-file corpus/annotations/pilot_annotations.json
